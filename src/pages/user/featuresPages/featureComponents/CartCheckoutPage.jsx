@@ -117,10 +117,10 @@ const Checkout = () => {
       const wallet = await axiosInstance.post("/wallet_balance", { userId });
       if (wallet.status === 200) {
         //toast.success("Wallet balance fetched successfully");
-        setWalletBalance(wallet.data.balance);
+        // setWalletBalance(wallet.data.balance);
       }
     } catch (error) {
-      //console.error("Error fetching wallet balance:", error);
+      // console.error("Error fetching wallet balance:", error);
       // toast.error("Failed to fetch wallet balance");
     }
   };

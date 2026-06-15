@@ -137,12 +137,12 @@ import { toast } from "sonner";
 const EmailVerification = ({ linkFrom = "security", role = "user" }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ Loading state added
+  const [loading, setLoading] = useState(false); //  Loading state added
   const navigate = useNavigate();
 
   const handleEmailVerification = async (e) => {
     e.preventDefault();
-    setLoading(true); // ✅ Start loading
+    setLoading(true); //  Start loading
     setErrorMessage("");
     setSuccessMessage("");
 
@@ -187,7 +187,7 @@ const EmailVerification = ({ linkFrom = "security", role = "user" }) => {
       setErrorMessage(error.response?.data?.message || "Email verification failed.");
       toast.error("Email verification failed.");
     } finally {
-      setLoading(false); // ✅ Stop loading after API call
+      setLoading(false); //  Stop loading after API call
     }
   };
 
@@ -217,13 +217,13 @@ const EmailVerification = ({ linkFrom = "security", role = "user" }) => {
                   placeholder="Enter your registered email"
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  disabled={loading} // ✅ Disable input when loading
+                  disabled={loading} //  Disable input when loading
                 />
               </div>
               <button
                 type="submit"
                 className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center"
-                disabled={loading} // ✅ Disable button when loading
+                disabled={loading} //  Disable button when loading
               >
                 {loading ? (
                   <>
