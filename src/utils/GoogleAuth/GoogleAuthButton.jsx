@@ -1,8 +1,8 @@
 import { GoogleLogin } from "@react-oauth/google";
 import { toast } from "sonner";
 import { axiosInstance } from "../../api/axiosConfig";
-import Cookies from "js-cookie"; 
-import { useNavigate } from "react-router-dom"; 
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
     const navigate = useNavigate(); // For redirection
@@ -17,13 +17,13 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
             if (res.status === 200) {
                 const { accessToken, message } = res.data;
 
-                
+
                 toast.success(message);
 
-               
+
                 Cookies.set(`access_token`, accessToken, {
-                    expires: 45/1440, 
-                    secure: true, 
+                    expires: 45 / 1440,
+                    secure: false,
                     sameSite: "Strict",
                 });
 
@@ -47,17 +47,17 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
     };
 
     return (
-       <div className="w-full">
-         <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleFailure}
-            useOneTap
-            theme={isDarkMode ? "filled_black" : "outline"}
-            size="large"
-            shape="rectangular"
-            text="continue_with"            
-        />
-       </div>
+        <div className="w-full">
+            <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleFailure}
+                useOneTap
+                theme={isDarkMode ? "filled_black" : "outline"}
+                size="large"
+                shape="rectangular"
+                text="continue_with"
+            />
+        </div>
     );
 };
 

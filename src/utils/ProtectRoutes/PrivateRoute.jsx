@@ -1,30 +1,33 @@
 import Cookies from 'js-cookie';
 import {Navigate} from 'react-router-dom';
-
+import { jwtDecode } from "jwt-decode";
 
 const PrivateRoute = ({allowedRole, redirectTo, children})=> {
     // const accessToken = Cookies.get(`${allowedRole}_access_token`);
     const accessToken = Cookies.get(`access_token`);
   
-    const getRoleFromToken = (token) => {
-        if(!token) return null;
-        try {
-            const payload = token.split(".")[1];
-            const decodedPayload = atob(payload);
-            const decoded = JSON.parse(decodedPayload);
-            // console.log(decoded);
-            return decoded?.role;
-        } catch (error) {
-            console.log("Error decoding token or getting role:", error);
-            return null;
-        }
-    };
-    const userRole = getRoleFromToken(accessToken);
-    const isAuthorized = allowedRole === userRole;
-    if(!isAuthorized) {
-        return <Navigate to={redirectTo} replace />
+    if (!accessToken) {
+        return <Navigate to={redirectTo} replace />;
     }
-    return children;
-}
 
+    try {
+        const decoded = jwtDecode(accessToken);
+        if (decoded.exp * 1000 < Date.now()) {
+            return <Navigate to={redirectTo} replace />;
+        }
+        
+        const userRole = decoded?.role;
+        const isAuthorized = allowedRole === userRole;
+        
+        if(!isAuthorized) {
+            return <Navigate to={redirectTo} replace />
+        }
+        
+        return children;
+        
+    } catch(err) {
+        console.error("Token decoding error:", err);
+        return <Navigate to={redirectTo} replace />;
+    }
+}
 export default PrivateRoute;
