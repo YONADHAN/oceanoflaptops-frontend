@@ -161,7 +161,7 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
               <div className="relative cursor-pointer">
                 <ShoppingCart size={24} className="text-gray-white" />
 
-                <span
+                {/* <span
                   className="
       absolute
       -top-2
@@ -181,7 +181,7 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
     "
                 >
                   5
-                </span>
+                </span> */}
               </div>
 
             </div>
