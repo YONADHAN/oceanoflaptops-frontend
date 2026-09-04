@@ -2,17 +2,16 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { axiosInstance } from "../../../../api/axiosConfig";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
 
 const AddAddressModal = ({ isOpen, onClose, onAddressAdded, redirectToCheckout = false }) => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   const handleAddAddress = async (newAddress) => {
     try {
-      const token = Cookies.get('access_token');
-      const decode = jwtDecode(token);
-      const userId = decode._id;
+      if (!isAuthenticated || !user) return;
+      const userId = user._id;
 
       const response = await axiosInstance.post('/address_add', { newAddress, userId });
 

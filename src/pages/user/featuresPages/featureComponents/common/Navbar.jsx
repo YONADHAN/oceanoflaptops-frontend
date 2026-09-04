@@ -1,7 +1,7 @@
 
 
 
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Menu,
 
@@ -9,7 +9,7 @@ import {
   Heart,
   ShoppingCart,
   X,
-  
+
   LogOut,
   Laptop
 } from "lucide-react";
@@ -18,7 +18,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import { axiosInstance } from "../../../../../api/axiosConfig";
-import { cartService } from "../../../../../apiServices/userApiServices";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCartCountAsync } from "../../../../../redux/slices/cartSlice";
@@ -166,11 +165,10 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
                 <Heart size={20} />
                 {wishlistCount > 0 && (
                   <span
-                    className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${
-                      isDarkMode
+                    className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${isDarkMode
                         ? "bg-blue-600 text-white"
                         : "bg-red-500 text-white"
-                    }`}
+                      }`}
                   >
                     {wishlistCount}
                   </span>
@@ -189,11 +187,10 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
                 <ShoppingCart size={20} />
                 {cartCount > 0 && (
                   <span
-                    className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${
-                      isDarkMode
+                    className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${isDarkMode
                         ? "bg-blue-600 text-white"
                         : "bg-red-500 text-white"
-                    }`}
+                      }`}
                   >
                     {cartCount}
                   </span>
@@ -201,7 +198,7 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
               </div>
             </button>
 
-            {!Cookies.get('access_token') && (
+            {!isAuthenticated && (
               <div onClick={() => navigate('/user/signin')} className="ml-2">
                 <button className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex justify-center items-center">
                   Sign In
@@ -209,7 +206,7 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
               </div>
             )}
 
-            {Cookies.get('access_token') && (
+            {isAuthenticated && (
               <button
                 onClick={handleLogout}
                 className={`ml-2 p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDarkMode

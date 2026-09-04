@@ -3,16 +3,16 @@ import React, { useState, useEffect } from "react";
 import Table from "../../../components/MainComponents/Table";
 import { wishlistService, cartService } from "../../../apiServices/userApiServices";
 import { toast } from "sonner";
-import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
 import Pagination from "../../../components/MainComponents/Pagination";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
 import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice";
 import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
 
 const Wishlist = () => {
     const dispatch = useDispatch();
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
     const [wishlist, setWishlist] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -22,11 +22,9 @@ const Wishlist = () => {
     const fetchWishlist = async (page) => {
         setIsLoading(true);
         try {
-            const token = Cookies.get("access_token");
-            if (!token) throw new Error("Authentication token not found");
+            if (!isAuthenticated || !user) throw new Error("Authentication token not found");
 
-            const decoded = jwtDecode(token);
-            const userId = decoded._id;
+            const userId = user._id;
 
             const response = await wishlistService.getWishlists({ userId, page, limit: itemsPerPage });
             if (!response || !response.data) {
@@ -64,9 +62,8 @@ const Wishlist = () => {
 
     const handleRemove = async (id) => {
         try {
-            const token = Cookies.get("access_token");
-            const decoded = jwtDecode(token);
-            const userId = decoded._id;
+            if (!isAuthenticated || !user) return;
+            const userId = user._id;
 
             const response = await wishlistService.removeFromWishlist(userId, id);
             if (response.status === 200) {

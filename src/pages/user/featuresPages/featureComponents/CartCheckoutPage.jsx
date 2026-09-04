@@ -6,14 +6,14 @@ import {
   authService,
   checkoutService,
 } from "../../../../apiServices/userApiServices";
-import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AddAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementAddAddress";
 import EditAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementEditAddress";
 import CouponCard from "../../../../components/UserComponents/coupons/couponCard";
 import PaymentFailure from "../../../../pages/others/PaymentFailure";
 const Checkout = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("Razor pay");
@@ -47,14 +47,11 @@ const Checkout = () => {
   }, [navigate]);
   const fetchCartData = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         navigate("/user/signin");
         return;
       }
-
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      const userId = user._id;
 
       //const response = await axiosInstance.post("/cart_data", { userId });//--------------------------------
       const response = await cartService.getCartData(userId);
@@ -71,15 +68,11 @@ const Checkout = () => {
 
   const fetchCart = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-
-      const decoded = jwtDecode(token);
-
-      const userId = decoded._id;
+      const userId = user._id;
       const response = await cartService.getCart({ userId });
       if (!response.data.success) {
         toast.error(response.data.message || "Failed to fetch cart");
@@ -105,15 +98,11 @@ const Checkout = () => {
 
   const fetchWalletBalance = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-
-      const decoded = jwtDecode(token);
-
-      const userId = decoded._id;
+      const userId = user._id;
       const wallet = await axiosInstance.post("/wallet_balance", { userId });
       if (wallet.status === 200) {
         setWalletBalance(wallet.data.balance);
@@ -135,14 +124,12 @@ const Checkout = () => {
   const fetchAddresses = async () => {
     setAddressesLoading(true);
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-      const decoded = jwtDecode(token);
       const response = await axiosInstance.get(
-        `/addresses_get?userId=${decoded._id}`
+        `/addresses_get?userId=${user._id}`
       );
       if (response.data.addresses) {
         const sortedAddresses = response.data.addresses.sort((a, b) => {
@@ -173,9 +160,8 @@ const Checkout = () => {
   };
 
   const cartRefresh = async () => {
-    const token = Cookies.get("access_token");
-    const decoded = jwtDecode(token);
-    const userId = decoded._id;
+    if (!isAuthenticated || !user) return;
+    const userId = user._id;
     try {
       const response = await axiosInstance.post("/refresh_cart", { userId });
 
@@ -206,12 +192,10 @@ const Checkout = () => {
 
   const apply_coupon_ultimate = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) throw new Error("No access token found");
+      if (!isAuthenticated || !user) throw new Error("No user found");
 
-      const decoded = jwtDecode(token);
       const response = await axiosInstance.post("/apply_coupon_ultimate", {
-        userId: decoded._id,
+        userId: user._id,
         couponCode: appliedCouponCode,
       });
 
@@ -244,11 +228,10 @@ const Checkout = () => {
         return;
       }
 
-      const token = Cookies.get("access_token");
-      const decoded = jwtDecode(token);
+      if (!isAuthenticated || !user) return;
 
       const orderData = {
-        user: decoded._id,
+        user: user._id,
         orderItems: cart.items.map((item) => ({
           product: item.productId,
           productName: item.productName,

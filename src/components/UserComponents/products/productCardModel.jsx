@@ -8,14 +8,14 @@ import { toast } from "sonner"
 import { axiosInstance } from "../../../api/axiosConfig"
 import { wishlistService } from "../../../apiServices/userApiServices"
 import { useNavigate } from "react-router-dom"
-import { jwtDecode } from "jwt-decode"
 import Cookies from "js-cookie"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice"
 import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice"
 
 const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
   const dispatch = useDispatch()
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
   const [isWishlist, setIsWishlist] = useState(false)
   const [textColor, setTextColor] = useState("text-gray-600")
   const [isProcessing, setIsProcessing] = useState(false)
@@ -45,14 +45,11 @@ const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
   const getWishlistStatus = async () => {
     if (fromLandingPage) return
     try {
-      const token = Cookies.get("access_token")
-      if (!token) {
+      if (!isAuthenticated || !user) {
         return
-        //throw new Error("Authentication token not found")
       }
 
-      const decoded = jwtDecode(token)
-      const userId = decoded._id
+      const userId = user._id
       const productId = product._id
 
       const response = await wishlistService.getWishlistStatus(userId, productId)
@@ -73,15 +70,12 @@ const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
     setIsProcessing(true)
 
     try {
-      const token = Cookies.get("access_token")
-      if (!token) {
+      if (!isAuthenticated || !user) {
         navigate('/user/signin')
         return
-        //throw new Error("Authentication token not found")
       }
 
-      const decoded = jwtDecode(token)
-      const userId = decoded._id
+      const userId = user._id
       const productId = product._id
 
 
@@ -115,8 +109,7 @@ const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
 
   const AddToCart = async () => {
     try {
-      const token = Cookies.get('access_token')
-      if (!token) {
+      if (!isAuthenticated || !user) {
         navigate('/user/signin');
         return;
       }

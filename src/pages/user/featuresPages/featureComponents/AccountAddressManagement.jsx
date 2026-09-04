@@ -4,9 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../../api/axiosConfig";
 import {authService } from "../../../../apiServices/userApiServices";
-import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { jwtDecode as jwt_decode } from "jwt-decode";
+import { useSelector } from 'react-redux';
 import ConfirmationAlert from "../../../../components/MainComponents/ConformationAlert";
 import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
@@ -145,6 +144,7 @@ function AddressCard({ address, onRemove, onSetDefault, onEdit }) {
 }
 
 export default function AddressManagement() {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [addresses, setAddresses] = useState([]);
   const [defaultAddressId, setDefaultAddressId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -169,19 +169,12 @@ export default function AddressManagement() {
   };
 
   useEffect(() => {
-    const token = Cookies.get("access_token");
-    if (!token) {
-      toast.error("Token not found");
+    if (!isAuthenticated || !user) {
+      toast.error("User not authenticated");
       return;
     }
-    try {
-      const { _id: userId } = jwt_decode(token);
-      fetchAddresses(userId);
-    } catch (err) {
-      console.error("Error decoding token:", err);
-      toast.error("Invalid token");
-    }
-  }, []);
+    fetchAddresses(user._id);
+  }, [isAuthenticated, user]);
 
   const removeAddress = async (id) => {
     try {
@@ -205,17 +198,13 @@ export default function AddressManagement() {
       if (response.status === 200) {
         toast.success("Default address updated successfully");
         setDefaultAddressId(id);
-        
-        const token = Cookies.get("access_token");
-        const { _id: userId } = jwt_decode(token);
-        await fetchAddresses(userId);
+        setDefaultAddressId(id);
+        if (user) await fetchAddresses(user._id);
       }
       toast.success("Default address updated successfully");
       setDefaultAddressId(id);
-      
-      const token = Cookies.get("access_token");
-      const { _id: userId } = jwt_decode(token);
-      await fetchAddresses(userId);
+      setDefaultAddressId(id);
+      if (user) await fetchAddresses(user._id);
     } catch (err) {
       console.error("Error setting default address:", err);
       toast.error("Failed to set default address");

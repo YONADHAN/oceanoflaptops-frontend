@@ -6,12 +6,13 @@ import ConfirmationAlert from "../../../components/MainComponents/ConformationAl
 import { Wallet, ArrowDownLeft, ArrowUpRight, Clock, Plus, ArrowRightLeft, CreditCard } from "lucide-react"
 import { axiosInstance } from "../../../api/axiosConfig"
 import Cookies from "js-cookie"
-import { jwtDecode } from "jwt-decode"
 import { toast } from "sonner"
+import { useSelector } from "react-redux"
 import { motion, AnimatePresence } from "framer-motion"
 import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs'
 
 const WalletComponent = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
   const [walletData, setWalletData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [userId, setUserId] = useState(null)
@@ -25,14 +26,12 @@ const WalletComponent = () => {
   const fetchWalletData = useCallback(async (page) => {
     setIsLoading(true)
     try {
-      const token = Cookies.get("access_token")
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Authentication token not found, please try to login again.")
         return
       }
 
-      const decoded = jwtDecode(token)
-      const currentUserId = decoded._id
+      const currentUserId = user._id
       setUserId(currentUserId)
 
       const response = await axiosInstance.post("/get_wallet_history", {

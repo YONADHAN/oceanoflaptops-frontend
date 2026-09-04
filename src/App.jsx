@@ -1,14 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { useDispatch } from 'react-redux';
+import { fetchAuthSession } from './redux/slices/authSlice';
 import AdminRoutes from './routes/adminRoutes';
 import UserRoutes from './routes/userRoutes';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Error404Page from './pages/others/Error404';
-import PublicRoutes from './routes/PublicRoutes'
-// import PublicRoutes from './routes/PublicRoutes'
+import PublicRoutes from './routes/PublicRoutes';
+
 const App = () => {
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchAuthSession());
+  }, [dispatch]);
 
   if (!clientId) {
     console.error('Google Client ID is missing! Please set it in your environment variables.');
@@ -18,13 +25,13 @@ const App = () => {
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <Router>
-        <Toaster position="top-right" richColors toastOptions={{ style: { marginTop: '50px' } }}/>
-        <Routes>         
-          
+        <Toaster position="top-right" richColors toastOptions={{ style: { marginTop: '50px' } }} />
+        <Routes>
+
           <Route path="/*" element={<PublicRoutes />} />
           <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route path="/user/*" element={<UserRoutes />} />          
-          <Route path="*" element={<Error404Page />} />     
+          <Route path="/user/*" element={<UserRoutes />} />
+          <Route path="*" element={<Error404Page />} />
 
         </Routes>
       </Router>

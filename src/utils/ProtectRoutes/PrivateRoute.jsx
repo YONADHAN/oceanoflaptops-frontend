@@ -1,33 +1,28 @@
-import Cookies from 'js-cookie';
-import {Navigate} from 'react-router-dom';
-import { jwtDecode } from "jwt-decode";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import LoadingSpinner from '../../pages/others/commonReusableComponents/LoadingSpinner';
 
-const PrivateRoute = ({allowedRole, redirectTo, children})=> {
-    // const accessToken = Cookies.get(`${allowedRole}_access_token`);
-    const accessToken = Cookies.get(`access_token`);
-  
-    if (!accessToken) {
+const PrivateRoute = ({ allowedRole, redirectTo, children }) => {
+    const { isAuthenticated, isInitialized, role } = useSelector((state) => state.auth);
+
+    if (!isInitialized) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <LoadingSpinner size="lg" />
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
         return <Navigate to={redirectTo} replace />;
     }
 
-    try {
-        const decoded = jwtDecode(accessToken);
-        if (decoded.exp * 1000 < Date.now()) {
-            return <Navigate to={redirectTo} replace />;
-        }
-        
-        const userRole = decoded?.role;
-        const isAuthorized = allowedRole === userRole;
-        
-        if(!isAuthorized) {
-            return <Navigate to={redirectTo} replace />
-        }
-        
-        return children;
-        
-    } catch(err) {
-        console.error("Token decoding error:", err);
+    if (allowedRole !== role) {
         return <Navigate to={redirectTo} replace />;
     }
-}
+
+    return children;
+};
+
 export default PrivateRoute;

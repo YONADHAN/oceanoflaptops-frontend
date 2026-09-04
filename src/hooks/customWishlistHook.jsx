@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FiHeart } from "react-icons/fi";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
 import { wishlistService } from "../apiServices/userApiServices";
 
 const useWishlist = (productId) => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [isWishlist, setIsWishlist] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -13,14 +13,12 @@ const useWishlist = (productId) => {
   useEffect(() => {
     const checkWishlistStatus = async () => {
       try {
-        const token = Cookies.get("access_token");
-        if (!token) {
+        if (!isAuthenticated || !user) {
           setIsLoading(false);
           return;
         }
 
-        const decoded = jwtDecode(token);
-        const userId = decoded._id;
+        const userId = user._id;
 
         const response = await wishlistService.getWishlistStatus(userId, productId);
         
@@ -43,8 +41,7 @@ const useWishlist = (productId) => {
   const toggleWishlist = async () => {
     if (isProcessing) return;
     
-    const token = Cookies.get("access_token");
-    if (!token) {
+    if (!isAuthenticated || !user) {
       toast.error("Please login to manage wishlist");
       return;
     }
@@ -52,8 +49,7 @@ const useWishlist = (productId) => {
     setIsProcessing(true);
     
     try {
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      const userId = user._id;
 
       const response = isWishlist
         ? await wishlistService.removeFromWishlist(userId, productId)

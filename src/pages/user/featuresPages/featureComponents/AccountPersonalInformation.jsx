@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from 'js-cookie';
+import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
-import { jwtDecode as jwt_decode } from 'jwt-decode';
 import { authService } from '../../../../apiServices/userApiServices'
 import ConfirmationAlert from '../../../../components/MainComponents/ConformationAlert';
 import { motion } from "framer-motion";
@@ -22,6 +21,7 @@ import {
 } from "react-icons/fa";
 
 const AccountPersonalInformation = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEditPageAlert, setShowEditPageAlert] = useState(false);
@@ -47,14 +47,11 @@ const AccountPersonalInformation = () => {
 
   const fetchData = async () => {
     try {
-      // const token = Cookies.get("user_access_token");
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-      const decoded = jwt_decode(token);
-      const userId = decoded._id;
+      const userId = user._id;
       // const personalData = await axiosInstance.post("/user_details", { userId });
       const personalData = await authService.getUserDetails(userId);
       if (!personalData) {

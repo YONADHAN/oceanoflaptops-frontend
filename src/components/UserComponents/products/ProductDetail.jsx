@@ -12,12 +12,13 @@ import {
 import { axiosInstance } from "../../../api/axiosConfig";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
 import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice";
 
 const ProductDetailPage = ({ productId }) => {
   const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,10 +110,9 @@ const ProductDetailPage = ({ productId }) => {
 
   const handleQuantityChange = async (action) => {
     try {
-      const token = Cookies.get('access_token');
-      if (!token) {
+      if (!isAuthenticated) {
         navigate('/user/signin');
-        return
+        return;
       }
       const response = await axiosInstance.post("get_quantity", {
         productId: product._id,
@@ -190,8 +190,7 @@ const ProductDetailPage = ({ productId }) => {
 
   const handleAddToCart = async () => {
     try {
-      const token = Cookies.get('access_token');
-      if (!token) {
+      if (!isAuthenticated) {
         navigate('/user/signin');
         return;
       }
@@ -242,14 +241,11 @@ const ProductDetailPage = ({ productId }) => {
 
   const getWishlistStatus = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
-        return
-        // throw new Error("Authentication token not found");
+      if (!isAuthenticated || !user) {
+        return;
       }
 
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      const userId = user._id;
       const productId = product._id;
 
       //const response = await axiosInstance.post(`/check_if_in_wishlist`, { userId, productId });
@@ -276,15 +272,12 @@ const ProductDetailPage = ({ productId }) => {
     setIsProcessing(true);
 
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
-        navigate('/user/signin')
-        return
-        //throw new Error("Authentication token not found");
+      if (!isAuthenticated || !user) {
+        navigate('/user/signin');
+        return;
       }
 
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      const userId = user._id;
       const productId = product._id;
 
       console.log("Product ID:", productId);

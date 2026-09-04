@@ -2,22 +2,18 @@ import React from 'react';
 import AddressForm from './AccountAddressManagementAddressForm';
 import {axiosInstance} from '../../../../api/axiosConfig';
 import {authService} from '../../../../apiServices/userApiServices'
-import cookies from 'js-cookie';
-import {jwtDecode as jwt_decode } from 'jwt-decode'; 
+import { useSelector } from 'react-redux';
 import {toast} from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 const AddAddress = ({ redirectToCheckout = false, onSuccess }) => {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   const handleAddAddress = async (newAddress) => {
     try {
-      
-      const token = cookies.get('access_token');      
-
-      const decode = jwt_decode(token);
-      
-      const userId = decode._id;
+      if (!isAuthenticated || !user) return;
+      const userId = user._id;
 
       const response = await authService.addAddress(newAddress, userId);
 

@@ -36,6 +36,17 @@ const attachResponseInterceptor = async (
       //console.error("Interceptor Error:", error);
       const originalRequest = error.config;
 
+      // Phase 3 exception: Let auth bootstrap endpoints fail naturally
+      // so Redux fetchAuthSession can handle the expected unauthenticated state
+      // without triggering infinite loops, toasts, or forced redirects.
+      if (
+        originalRequest &&
+        (originalRequest.url.includes("/auth/user/me") || originalRequest.url.includes("/auth/admin/me")) &&
+        (error.response?.status === 401 || error.response?.status === 403)
+      ) {
+        return Promise.reject(error);
+      }
+
       if (
         error.response?.status === 401 &&
         error.response?.data?.message === "Token is invalid or expired." &&
