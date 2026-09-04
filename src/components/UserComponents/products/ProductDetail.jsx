@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {Minus, Plus, ChevronRight } from "lucide-react";
+import { Minus, Plus, ChevronRight, ShoppingCart } from "lucide-react";
 import { FiHeart } from "react-icons/fi";
 
 import { toast } from "sonner";
@@ -12,8 +12,12 @@ import {
 import { axiosInstance } from "../../../api/axiosConfig";
 import { jwtDecode } from "jwt-decode";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
+import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice";
 
 const ProductDetailPage = ({ productId }) => {
+  const dispatch = useDispatch();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -67,7 +71,7 @@ const ProductDetailPage = ({ productId }) => {
         setError(errorMessage);
       } finally {
         setLoading(false);
-      
+
       }
     };
 
@@ -106,7 +110,7 @@ const ProductDetailPage = ({ productId }) => {
   const handleQuantityChange = async (action) => {
     try {
       const token = Cookies.get('access_token');
-      if(!token){
+      if (!token) {
         navigate('/user/signin');
         return
       }
@@ -187,7 +191,7 @@ const ProductDetailPage = ({ productId }) => {
   const handleAddToCart = async () => {
     try {
       const token = Cookies.get('access_token');
-      if(!token) {
+      if (!token) {
         navigate('/user/signin');
         return;
       }
@@ -201,6 +205,7 @@ const ProductDetailPage = ({ productId }) => {
         return;
       }
 
+      dispatch(fetchCartCountAsync());
       toast.success("Product added to cart successfully");
     } catch (err) {
       const errorMessage =
@@ -235,36 +240,36 @@ const ProductDetailPage = ({ productId }) => {
 
 
 
-   const getWishlistStatus = async () => {
-      try {
-        const token = Cookies.get("access_token");
-        if (!token) {         
-          return
-         // throw new Error("Authentication token not found");
-        }
-  
-        const decoded = jwtDecode(token);
-        const userId = decoded._id;
-        const productId = product._id;
-  
-        //const response = await axiosInstance.post(`/check_if_in_wishlist`, { userId, productId });
-        const response = await wishlistService.getWishlistStatus(
-          userId,
-          productId
-        );
-  
-        if (response.status === 200) {
-          setIsWishlist(response.data.isInWishlist);
-        } else {
-          toast.error(response.data.message || "Unexpected response from server");
-        }
-      } catch (error) {
-        console.error("Error getting wishlist status:", error);
-        toast.error(
-          error.response?.data?.message || "Failed to get wishlist data"
-        );
+  const getWishlistStatus = async () => {
+    try {
+      const token = Cookies.get("access_token");
+      if (!token) {
+        return
+        // throw new Error("Authentication token not found");
       }
-    };
+
+      const decoded = jwtDecode(token);
+      const userId = decoded._id;
+      const productId = product._id;
+
+      //const response = await axiosInstance.post(`/check_if_in_wishlist`, { userId, productId });
+      const response = await wishlistService.getWishlistStatus(
+        userId,
+        productId
+      );
+
+      if (response.status === 200) {
+        setIsWishlist(response.data.isInWishlist);
+      } else {
+        toast.error(response.data.message || "Unexpected response from server");
+      }
+    } catch (error) {
+      console.error("Error getting wishlist status:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to get wishlist data"
+      );
+    }
+  };
 
   const handleWishlistChange = async () => {
     if (isProcessing) return;
@@ -299,6 +304,7 @@ const ProductDetailPage = ({ productId }) => {
       if (response?.status === 200 && response.data.success !== false) {
         setIsWishlist(!isWishlist);
         toast.success(successMessage);
+        dispatch(fetchWishlistCountAsync());
       } else {
         throw new Error(response.data.message || "Unexpected server response");
       }
@@ -332,7 +338,7 @@ const ProductDetailPage = ({ productId }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
         {/* Image Gallery */}
-        <div className="space-y-4">
+        <div className="space-y-4 lg:relative lg:z-50">
           <div className="relative">
             <div
               className="relative aspect-square overflow-hidden cursor-zoom-in "
@@ -349,21 +355,19 @@ const ProductDetailPage = ({ productId }) => {
               <button className="absolute top-2 right-2 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors">
                 <FiHeart
                   onClick={handleWishlistChange}
-                  className={`w-5 h-5 ${
-                    isWishlist ? "fill-red-700 text-red-700" : "text-gray-600"
-                  }`}
+                  className={`w-5 h-5 ${isWishlist ? "fill-red-700 text-red-700" : "text-gray-600"
+                    }`}
                 />
               </button>
             </div>
             {isZoomed && (
-              <div className="hidden md:block absolute top-16 left-full ml-4 w-[500px] h-[450px] rounded-lg shadow-lg bg-white overflow-hidden">
+              <div className="hidden md:block absolute top-16 left-full ml-4 w-[500px] h-[450px] rounded-lg shadow-2xl bg-white overflow-hidden z-50">
                 <div
                   className="absolute inset-0"
                   style={{
                     backgroundImage: `url(${product.productImage[currentImage]})`,
-                    backgroundPosition: `${zoomPosition.x * 100}% ${
-                      zoomPosition.y * 100
-                    }%`,
+                    backgroundPosition: `${zoomPosition.x * 100}% ${zoomPosition.y * 100
+                      }%`,
                     backgroundSize: "400%",
                     backgroundRepeat: "no-repeat",
                   }}
@@ -376,9 +380,8 @@ const ProductDetailPage = ({ productId }) => {
               <button
                 key={index}
                 onClick={() => setCurrentImage(index)}
-                className={`relative aspect-square rounded-lg overflow-hidden ${
-                  currentImage === index ? "ring-2 ring-blue-500" : ""
-                }`}
+                className={`relative aspect-square rounded-lg overflow-hidden ${currentImage === index ? "ring-2 ring-blue-500" : ""
+                  }`}
               >
                 <img
                   src={imageUrl}
@@ -391,136 +394,92 @@ const ProductDetailPage = ({ productId }) => {
         </div>
 
         {/* Product Details */}
-        <div className="space-y-6">
-          <h1 className="text-3xl font-bold">{product.productName}</h1>
-
-          <div className="space-y-2">
-            <p className="text-lg">
-              Brand: <span className="font-semibold">{product.brand}</span>
-            </p>
-            <p className="text-lg">
-              Model Number:{" "}
-              <span className="font-semibold">{product.modelNumber}</span>
-            </p>
+        <div className="space-y-5">
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3">
+              {product.productName}
+            </h1>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-gray-500">
+              <span className="bg-gray-100 px-3 py-1 rounded-full font-medium text-gray-700">Brand: {product.brand}</span>
+              <span className="bg-gray-100 px-3 py-1 rounded-full font-medium text-gray-700">Model: {product.modelNumber}</span>
+              <div className="flex items-center space-x-1.5 border border-gray-200 bg-white shadow-sm px-3 py-1 rounded-full">
+                <div className={`w-2 h-2 rounded-full ${product.status === "Available" ? "bg-green-500" : product.status === "Out of Stock" ? "bg-red-500" : "bg-yellow-500"}`}></div>
+                <span className={`font-semibold ${product.status === "Available" ? "text-green-600" : "text-red-600"}`}>
+                  {product.status.toUpperCase()} ({product.quantity} in stock)
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="text-2xl text-gray-500 line-through">
-              {indianCurrencyFormatter
-                .format((product.regularPrice).toFixed(0))
-                .replace(".00", "")}
+          <div className="flex items-baseline space-x-3 bg-blue-50/30 p-4 rounded-xl border border-blue-100/50">
+            <span className="text-4xl font-black text-gray-900 tracking-tight">
+              {indianCurrencyFormatter.format(Number(product.salePrice).toFixed(0)).replace(".00", "")}
+            </span>
+            {product.regularPrice > product.salePrice && (
+              <span className="text-xl text-gray-400 line-through font-medium">
+                {indianCurrencyFormatter.format((product.regularPrice).toFixed(0)).replace(".00", "")}
+              </span>
+            )}
+          </div>
+
+          <p className="text-gray-600 leading-relaxed text-base">
+            {product.description}
+          </p>
+
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+            <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden h-[52px]">
+              <button
+                onClick={() => handleQuantityChange("decrease")}
+                className="px-4 h-full text-gray-500 hover:bg-white hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={quantity <= 1}
+              >
+                <Minus className="w-5 h-5" />
+              </button>
+              <div className="w-12 text-center font-bold text-gray-900 text-lg">
+                {quantity}
+              </div>
+              <button
+                onClick={() => handleQuantityChange("increase")}
+                className="px-4 h-full text-gray-500 hover:bg-white hover:text-gray-900 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
-            <div className="text-3xl font-bold text-red-600">
-              {indianCurrencyFormatter
-                .format(Number(product.salePrice).toFixed(0))
-                .replace(".00", "")
-                }
-            </div>
+
+            <button
+              onClick={handleAddToCart}
+              className="flex-1 h-[52px] bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-xl flex items-center justify-center space-x-3 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 w-full"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              <span className="text-lg tracking-wide">Add to Cart</span>
+            </button>
           </div>
 
           {/* Specifications */}
-          <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Specifications</h2>
-            <div className="grid gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Processor</span>
-                <span>
-                  {product.processor.brand} {product.processor.model}{" "}
-                  {product.processor.generation}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">RAM</span>
-                <span>
-                  {product.ram.size} {product.ram.type}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Storage</span>
-                <span>
-                  {product.storage.type} {product.storage.capacity}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Graphics</span>
-                <span>
-                  {product.graphics.model} ({product.graphics.vram})
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Display</span>
-                <span>
-                  {product.display.size} - {product.display.resolution} (
-                  {product.display.refreshRate}Hz)
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Operating System</span>
-                <span>{product.operatingSystem}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Battery Life</span>
-                <span>{product.batteryLife} hours</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Weight</span>
-                <span>{product.weight} kg</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Ports</span>
-                <span>{product.ports}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <span className="text-gray-500">Product Category</span>
-                <span>{product.category.name}</span>
-              </div>
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mt-8">
+            <div className="bg-gray-50/50 px-6 py-4 border-b border-gray-100">
+              <h2 className="text-xl font-bold text-gray-900">Technical Specifications</h2>
             </div>
-          </div>
-
-          <div className="space-y-4">
-            <p className="text-gray-500">{product.description}</p>
-            <p className="text-lg">
-              Status:
-              <span
-                className={`ml-2 font-semibold ${
-                  product.status === "Available"
-                    ? "text-green-600"
-                    : "text-red-600"
-                }`}
-              >
-                {product.status}
-                {" ( " + product.quantity + " )"}
-              </span>
-            </p>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-6">
-            <div className="flex items-center border rounded-lg">
-              <button
-                onClick={() => handleQuantityChange("decrease")}
-                className="p-3 hover:bg-gray-100"
-                disabled={quantity <= 1}
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              <span className="px-6 py-2">{quantity}</span>
-              <button
-                onClick={() => handleQuantityChange("increase")}
-                className="p-3 hover:bg-gray-100"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
+            <div className="divide-y divide-gray-100">
+              {[
+                { label: "Processor", value: `${product.processor.brand} ${product.processor.model} ${product.processor.generation}` },
+                { label: "RAM", value: `${product.ram.size} ${product.ram.type}` },
+                { label: "Storage", value: `${product.storage.type} ${product.storage.capacity}` },
+                { label: "Graphics", value: `${product.graphics.model} (${product.graphics.vram})` },
+                { label: "Display", value: `${product.display.size} - ${product.display.resolution} (${product.display.refreshRate}Hz)` },
+                { label: "Operating System", value: product.operatingSystem },
+                { label: "Battery Life", value: `${product.batteryLife} hours` },
+                { label: "Weight", value: `${product.weight} kg` },
+                { label: "Ports", value: product.ports },
+                { label: "Product Category", value: product.category.name }
+              ].map((spec, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-3 gap-2 px-6 py-4 hover:bg-blue-50/50 transition-colors">
+                  <div className="text-sm font-semibold text-gray-500">{spec.label}</div>
+                  <div className="text-sm text-gray-900 md:col-span-2 font-medium">{spec.value}</div>
+                </div>
+              ))}
             </div>
-            {/* <button className="px-8 py-3 bg-gray-400 text-black rounded-lg hover:bg-blue-600 hover:text-white transition-colors flex-1">
-              Buy Now
-            </button> */}
-            <button
-              onClick={handleAddToCart}
-              className="px-8 py-3 bg-gray-400 text-black rounded-lg hover:bg-blue-600 hover:text-white transition-colors flex-1"
-            >
-              Add to Cart
-            </button>
           </div>
         </div>
       </div>

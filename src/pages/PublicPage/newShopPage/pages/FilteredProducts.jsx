@@ -39,9 +39,7 @@ const FilteredProducts = ({ products = [] }) => {
     };
 
     return (
-        <div className="container mx-auto px-4">
-            <h1 className="text-2xl font-bold mb-6">Filtered Products</h1>
-            
+        <div className="w-full">
             {/* Grid layout for products */}
             <div className="grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3 md:gap-x-3  gap-6 justify-items-center">
                 {products && products.length > 0 ? (
@@ -54,8 +52,12 @@ const FilteredProducts = ({ products = [] }) => {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full text-center py-10 text-blue-500">
-                        No products found
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-gray-500">
+                        <svg className="w-16 h-16 mb-4 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-xl font-medium">No products match your filters</p>
+                        <p className="mt-2 text-sm">Try adjusting your search or clearing some filters.</p>
                     </div>
                 )}
             </div>

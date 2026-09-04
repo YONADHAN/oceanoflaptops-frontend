@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import ConfirmationAlert from "../../../../components/MainComponents/ConformationAlert";
+import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 function AddressCard({ address, onRemove, onSetDefault, onEdit }) {
   const [isSettingDefault, setIsSettingDefault] = useState(false);
@@ -260,6 +261,9 @@ export default function AddressManagement() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }, { label: 'Address', path: '/user/features/account/addresses' }]} />
+      </div>
       <h1 className="text-3xl font-bold mb-8">Your Addresses</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <button

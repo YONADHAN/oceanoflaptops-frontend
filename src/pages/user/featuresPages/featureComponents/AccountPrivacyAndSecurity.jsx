@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LockIcon, UserMinusIcon, ShieldIcon as ShieldExclamationIcon, ChevronRightIcon, ShieldCheckIcon } from 'lucide-react';
+import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const AccountPrivacyAndSecurity = () => {
   const navigate = useNavigate();
@@ -59,6 +60,9 @@ const AccountPrivacyAndSecurity = () => {
   return (
     <div className="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }, { label: 'Security', path: '/user/features/account/security' }]} />
+        </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Account Privacy and Security</h1>
         <div className="flex flex-wrap justify-center -mx-3 gap-3">
           {securityCards.map((card, index) => (

@@ -4,6 +4,7 @@ import ProductFilter from "./components/Filters";
 import ProductList from "./components/productList";
 import { FaSearch } from "react-icons/fa";
 import { useDebounce } from "../../../../hooks/customDebounceHook"; 
+import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const App = () => {
   const [filters, setFilters] = useState({});
@@ -67,7 +68,11 @@ const App = () => {
   );
 
   return (
-    <div className="p-4">
+    <div className="min-h-screen w-full">
+      <div className="p-4 w-full">
+        <div className="mb-8 w-full flex justify-start pt-6">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Shop', path: '/shop' }]} />
+        </div>
       <div className="flex flex-col md:flex-row gap-6">
         {/* Sidebar Filters */}
         <div className="w-full md:w-1/4">
@@ -89,6 +94,7 @@ const App = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 

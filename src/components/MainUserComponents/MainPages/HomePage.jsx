@@ -6,6 +6,8 @@ import Banner from '../../UserComponents/Banner/Banner';
 import ProductCollection from '../../UserComponents/products/ProductCollection';
 import ComparisonModule from '../../MainComponents/ComparisonModule'
 import { productService } from '../../../apiServices/userApiServices'
+import { motion } from 'framer-motion';
+import { ShieldCheck, Clock, Wrench, Cpu, MonitorPlay, HardDrive } from 'lucide-react';
 
 const HomePage = () => {
   const [categories, setCategories] = useState([]);
@@ -40,41 +42,44 @@ const HomePage = () => {
       <Banner />
 
       {/* Features Section */}
-      <section className="py-16 px-4 md:px-8 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
-            Why Choose Our Laptops?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 ">
-            <div className="p-6 bg-gradient-to-br from-blue-100 to-blue-500 rounded-lg hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl  font-semibold mb-2">Premium Quality</h3>
-              <p className="text-gray-600">Military-grade durability and premium materials ensure long-lasting performance</p>
-            </div>
-
-            <div className="p-6 bg-gradient-to-br from-blue-100 to-blue-500 rounded-lg hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Fast Support</h3>
-              <p className="text-gray-600">24/7 technical support and on-site service within 24 hours</p>
-            </div>
-
-            <div className="p-6 bg-gradient-to-br from-blue-100 to-blue-500 rounded-lg hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">3-Year Warranty</h3>
-              <p className="text-gray-600">Comprehensive warranty covering parts and accidental damage</p>
-            </div>
+      <section className="py-24 px-4 md:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+              Why Choose Our Laptops?
+            </h2>
+            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+              We deliver unparalleled performance, uncompromising quality, and support that never sleeps.
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              { icon: ShieldCheck, title: "Premium Quality", desc: "Military-grade durability and premium materials ensure long-lasting performance." },
+              { icon: Clock, title: "Fast Support", desc: "24/7 technical support and on-site service within 24 hours." },
+              { icon: Wrench, title: "3-Year Warranty", desc: "Comprehensive warranty covering parts and accidental damage." }
+            ].map((feature, index) => (
+              <motion.div 
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.15 }}
+                className="p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
+              >
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600">
+                  <feature.icon size={32} strokeWidth={1.5} />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
@@ -82,39 +87,65 @@ const HomePage = () => {
 
 
       {/* Tech Specs Highlight */}
-      <section className="py-16 bg-blue-900 text-white mb-8">
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold mb-6">Cutting-Edge Technology</h2>
-              <ul className="space-y-4">
-                <li className="flex items-center">
-                  <svg className="w-6 h-6 mr-3 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Latest Gen Intel® Core™ & AMD Ryzen™ Processors
+      <section className="py-24 bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white relative overflow-hidden mb-12">
+        {/* Abstract shapes */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 transform -translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 md:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">Cutting-Edge <span className="text-blue-400">Technology</span></h2>
+              <p className="text-lg text-blue-100 mb-8 leading-relaxed">Experience uncompromised power with the latest hardware architecture designed for maximum performance and efficiency.</p>
+              <ul className="space-y-6">
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mr-4 border border-blue-500/30">
+                    <Cpu size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Advanced Processors</h4>
+                    <p className="text-blue-200">Latest Gen Intel® Core™ & AMD Ryzen™</p>
+                  </div>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-6 h-6 mr-3 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  NVIDIA® GeForce RTX™ & AMD Radeon™ Graphics
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mr-4 border border-blue-500/30">
+                    <MonitorPlay size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Dedicated Graphics</h4>
+                    <p className="text-blue-200">NVIDIA® GeForce RTX™ & AMD Radeon™</p>
+                  </div>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-6 h-6 mr-3 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Ultra-Fast PCIe NVMe SSD Storage
+                <li className="flex items-start">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mr-4 border border-blue-500/30">
+                    <HardDrive size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold mb-1">Ultra-Fast Storage</h4>
+                    <p className="text-blue-200">Lightning fast PCIe NVMe SSDs</p>
+                  </div>
                 </li>
               </ul>
-            </div>
-            <div className="relative h-96 bg-gray-800 rounded-xl overflow-hidden">
+            </motion.div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="relative h-[500px] rounded-3xl overflow-hidden shadow-2xl border border-gray-700 group"
+            >
               <img
-                src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1632&q=80"
+                src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1632&q=80"
                 alt="Laptop internals"
-                className="w-full h-full object-cover opacity-90"
+                className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700"
               />
-            </div>
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -126,10 +157,17 @@ const HomePage = () => {
         <div className="max-w-6xl mx-auto ">
           
 
-          {categories.map(category => (
-            <div key={category._id} className="mb-16">
+          {categories.map((category, index) => (
+            <motion.div 
+              key={category._id} 
+              className="mb-16"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+            >
               <ProductCollection categoryId={category._id} categoryName={category.name} />
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>

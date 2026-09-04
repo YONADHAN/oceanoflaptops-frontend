@@ -116,12 +116,10 @@ const Checkout = () => {
       const userId = decoded._id;
       const wallet = await axiosInstance.post("/wallet_balance", { userId });
       if (wallet.status === 200) {
-        //toast.success("Wallet balance fetched successfully");
-        // setWalletBalance(wallet.data.balance);
+        setWalletBalance(wallet.data.balance);
       }
     } catch (error) {
-      // console.error("Error fetching wallet balance:", error);
-      // toast.error("Failed to fetch wallet balance");
+      console.error("Error fetching wallet balance:", error);
     }
   };
 
@@ -170,7 +168,7 @@ const Checkout = () => {
   };
 
   const handleAddressSelect = (address) => {
-   
+
     setSelectedAddress(address);
   };
 
@@ -210,13 +208,13 @@ const Checkout = () => {
     try {
       const token = Cookies.get("access_token");
       if (!token) throw new Error("No access token found");
-  
+
       const decoded = jwtDecode(token);
       const response = await axiosInstance.post("/apply_coupon_ultimate", {
         userId: decoded._id,
         couponCode: appliedCouponCode,
       });
-  
+
       if (response.data.success) {
         toast.success("Coupon applied successfully!");
         setCouponDiscount(response.data.discountAmount || 0);
@@ -229,7 +227,7 @@ const Checkout = () => {
       throw error; // Re-throw so `handlePlaceOrder()` can handle it
     }
   };
-  
+
 
   const handlePlaceOrder = async () => {
 
@@ -299,7 +297,7 @@ const Checkout = () => {
           const { data: razorpayOrder } = await axiosInstance.post(
             "/create_razorpay_order",
             {
-              amount: orderData.totalAmount+15,
+              amount: orderData.totalAmount + 15,
             }
           );
 
@@ -397,7 +395,7 @@ const Checkout = () => {
       }
 
 
-      
+
 
       // try {
       //   const coupon = await axiosInstance.post("/apply_coupon_ultimate", {
@@ -417,11 +415,11 @@ const Checkout = () => {
     }
   };
 
-const editAddress = async(address) => {
-     handleAddressSelect(address)
+  const editAddress = async (address) => {
+    handleAddressSelect(address)
     setShowEditAddressForm(true)
-    return  
-}
+    return
+  }
 
 
 
@@ -501,15 +499,15 @@ const editAddress = async(address) => {
   const AddressForm = ({ data }) => (
     <div
       className={`p-4 border rounded-lg mb-3 cursor-pointer transition-all duration-200 ${selectedAddress?._id === data._id
-          ? "border-blue-500 bg-blue-50"
-          : "border-gray-200 hover:border-gray-300"
+        ? "border-blue-500 bg-blue-50"
+        : "border-gray-200 hover:border-gray-300"
         }`}
       onClick={() => handleAddressSelect(data)}
     >
 
       <div className="flex justify-between font-bold">
         {data.addressType.charAt(0).toUpperCase() + data.addressType.slice(1)} Address
-        <div className="px-3 py-[2px] rounded-md bg-blue-500 text-white inline" onClick={()=>editAddress(data)}>Edit</div>
+        <div className="px-3 py-[2px] rounded-md bg-blue-500 text-white inline" onClick={() => editAddress(data)}>Edit</div>
       </div>
 
       <div className="flex items-start">
@@ -595,7 +593,7 @@ const editAddress = async(address) => {
   // }
 
   if (showEditAddressForm && selectedAddress) {
-    
+
     return (
       <div>
         <EditAddress
@@ -606,7 +604,7 @@ const editAddress = async(address) => {
       </div>
     );
   }
-  
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -703,8 +701,8 @@ const editAddress = async(address) => {
                 <label
                   key={method.id}
                   className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all duration-200 ${paymentMethod === method.id
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                    ? "border-blue-500 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                     }`}
                 >
                   <input

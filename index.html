@@ -9,7 +9,47 @@
     <title>OceonOfLaptops</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .initial-loader {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .loader-logo {
+          font-size: 2.5rem;
+          font-weight: 900;
+          color: #1e3a8a;
+          margin-bottom: 1.5rem;
+          letter-spacing: -1px;
+          animation: pulse 2s infinite ease-in-out;
+        }
+        .loader-spinner {
+          width: 48px;
+          height: 48px;
+          border: 4px solid #bfdbfe;
+          border-top: 4px solid #2563eb;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(0.95); }
+        }
+      </style>
+      <div class="initial-loader">
+        <div class="loader-logo">OceanOfLaptops</div>
+        <div class="loader-spinner"></div>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
    
   </body>

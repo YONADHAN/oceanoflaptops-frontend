@@ -5,6 +5,7 @@
 
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 export default function Banner() {
   const navigate = useNavigate()
@@ -14,14 +15,19 @@ export default function Banner() {
       <div className="absolute inset-0">
         <img
           
-          src='https://helios-i.mashable.com/imagery/articles/044VW5dDLiH5aqARLFTP6qP/hero-image.fill.size_1248x702.v1710778445.png'
+          src='/images/laptop_banner_v2.png'
           alt="Laptop Display"
           className="w-full h-full object-cover opacity-90"
         />
       </div>
       
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-        <div className="max-w-4xl">
+        <motion.div 
+          className="max-w-4xl"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
           <h1 className="text-4xl md:text-6xl font-bold mb-8 text-white leading-tight">
             Kerala's Premier Destination for <span className="text-blue-400">Premium Laptops</span>
           </h1>
@@ -34,7 +40,7 @@ export default function Banner() {
           >
             Explore Collection →
           </button>
-        </div>
+        </motion.div>
       </div>
       
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Laptop } from "lucide-react";
 // import axios from 'axios';
 import { axiosInstance } from "../../../api/axiosConfig";
 import Cookies from "js-cookie";
 import { Toaster, toast } from "sonner";
 import GoogleButton from "../../../utils/GoogleAuth/GoogleAuthButton";
 import { authService } from "../../../apiServices/userApiServices";
+import { motion } from "framer-motion";
+
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -99,111 +101,116 @@ const Signin = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col lg:flex-row w-full md:w-2/3 max-w-4xl">
-        <div className="w-full lg:w-1/2 p-8 ">
-          <h2 className="text-2xl font-bold mb-2">Welcome back!</h2>
-          <p className="mb-6">You’ve been missed! Let’s get you signed in.</p>
-          <form onSubmit={handleSubmit} noValidate>
-            <div className="mb-4">
-              <label
-                className="block text-gray-700 font-bold mb-2"
-                htmlFor="email"
-              >
-                Email
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col lg:flex-row w-full md:w-4/5 lg:w-3/4 max-w-5xl"
+      >
+        {/* Left side: Image */}
+        <div className="w-full lg:w-1/2 hidden lg:block relative bg-gray-900">
+          <img
+            src="/images/auth_laptop_desk_1788446313829.png"
+            alt="Sign In"
+            className="absolute inset-0 h-full w-full object-cover opacity-70"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 to-blue-900/20 pointer-events-none"></div>
+          <div className="absolute bottom-10 left-10 text-white z-10 pr-8">
+            <h3 className="text-3xl font-bold mb-2">Welcome Back.</h3>
+            <p className="text-blue-100 text-lg">Sign in to access your premium laptop deals and personalized experience.</p>
+          </div>
+        </div>
+
+        {/* Right side: Form */}
+        <div className="w-full lg:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-white">
+          <div className="flex items-center justify-center mb-8 lg:hidden">
+            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <Laptop className="text-blue-600" size={24} />
+            </div>
+          </div>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-2 text-center lg:text-left">Sign In</h2>
+          <p className="mb-8 text-gray-500 text-center lg:text-left">You've been missed! Let's get you signed in.</p>
+          
+          <form onSubmit={handleSubmit} noValidate className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="email">
+                Email Address
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
                 id="email"
                 type="email"
-                placeholder="Enter your email address"
+                placeholder="name@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            {/* <div className="mb-6">
-              <label
-                className="block text-gray-700 font-bold mb-2"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
-                type="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div> */}
-            <div className="mb-6 relative">
-              <label className="block text-gray-700 font-bold mb-2" htmlFor="password">
+            
+            <div className="relative">
+              <label className="block text-sm font-semibold text-gray-700 mb-2" htmlFor="password">
                 Password
               </label>
               <div className="relative">
                 <input
-                  className="shadow appearance-none border rounded w-full py-2 px-3 pr-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-800 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
                   type="button"
                   onClick={togglePasswordVisibility}
-                  className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-
-            <div className="flex items-center justify-center mb-4">
-              <div className="flex items-center"></div>
-
-              <p
-                className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800 hover:cursor-pointer"
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center">
+              </div>
+              <button
+                type="button"
+                className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
                 onClick={forgetPasswordEmail}
               >
-                Forgot your password?
-              </p>
+                Forgot password?
+              </button>
             </div>
+
             <button
-              className="bg-gray-500 mb-2 hover:bg-gray-700 text-white font-bold py-2 px-4 w-full rounded focus:outline-none focus:shadow-outline"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transform transition-all duration-200 hover:-translate-y-0.5"
               type="submit"
             >
               Log In
             </button>
           </form>
 
-          <div className=" flex justify-center">
+          <div className="my-8 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-gray-200 after:mt-0.5 after:flex-1 after:border-t after:border-gray-200">
+            <p className="mx-4 mb-0 text-center font-semibold text-gray-400 text-sm">
+              OR
+            </p>
+          </div>
+
+          <div className="flex justify-center mb-8">
             <GoogleButton role="user" />
           </div>
 
-          <p className="text-gray-700 mt-4 text-center">
-            Don’t have an account?{" "}
-            <a
-              href="#"
-              className="text-blue-500 hover:text-blue-800 font-bold"
+          <p className="text-gray-600 mt-4 text-center text-sm font-medium">
+            Don't have an account?{" "}
+            <button
+              className="text-blue-600 hover:text-blue-800 font-bold transition-colors"
               onClick={goSignup}
             >
-              Register here
-            </a>
+              Create one now
+            </button>
           </p>
         </div>
-
-        {/* Right side: Image */}
-        <div className="w-full lg:w-1/2 hidden  lg:block">
-          <img
-            src="http://media.ldlc.com/ld/products/00/04/01/11/LD0004011101_2_0004011196.jpg"
-            alt="Sign In"
-            className="h-full w-full object-contain"
-          />
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

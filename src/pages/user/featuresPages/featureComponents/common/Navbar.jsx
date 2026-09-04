@@ -18,11 +18,24 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import { axiosInstance } from "../../../../../api/axiosConfig";
+import { cartService } from "../../../../../apiServices/userApiServices";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCartCountAsync } from "../../../../../redux/slices/cartSlice";
+import { fetchWishlistCountAsync } from "../../../../../redux/slices/wishlistSlice";
 
 const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const cartCount = useSelector((state) => state.cart.count);
+  const wishlistCount = useSelector((state) => state.wishlist.count);
+
+  useEffect(() => {
+    dispatch(fetchCartCountAsync());
+    dispatch(fetchWishlistCountAsync());
+  }, [dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -65,24 +78,24 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 h-[70px] flex-col ${scrolled
+      className={`fixed w-full z-50 transition-all duration-300 h-[70px] flex flex-col justify-center ${scrolled
         ? isDarkMode
-          ? "bg-gray-900/95 backdrop-blur-md"
-          : "bg-blue-600/95 backdrop-blur-md shadow-lg"
+          ? "bg-gray-900/85 backdrop-blur-lg border-b border-gray-800"
+          : "bg-white/85 backdrop-blur-lg border-b border-gray-200 shadow-sm"
         : isDarkMode
-          ? "bg-gray-900"
-          : "bg-blue-700"
+          ? "bg-gray-900/50 backdrop-blur-md"
+          : "bg-white/50 backdrop-blur-md"
         }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 text-white">
+      <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <div className={`flex items-center justify-between h-16 ${isDarkMode ? "text-white" : "text-gray-800"}`}>
           {/* Left Section */}
           <div className="flex items-center">
             <button
               onClick={toggleSidebar}
-              className={`p-2 rounded-lg ${isDarkMode
-                ? "text-white hover:bg-gray-800"
-                : "text-gray-900 hover:bg-blue-100"
+              className={`p-2 rounded-lg transition-colors ${isDarkMode
+                ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 }`}
             >
               <Menu size={24} />
@@ -90,25 +103,25 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
 
             <div
               onClick={() => navigate('/')}
-              className="ml-4 flex items-center space-x-2 cursor-pointer"
+              className="ml-4 flex items-center space-x-2 cursor-pointer group"
             >
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${isDarkMode ? "bg-white" : "bg-blue-100"
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${isDarkMode ? "bg-white/10" : "bg-blue-100"
                   }`}
               >
                 <span
-                  className={`font-bold text-xl ${isDarkMode ? "text-white" : "text-blue-600"
+                  className={`font-bold text-xl ${isDarkMode ? "text-blue-400" : "text-blue-600"
                     }`}
                 >
-                  <Laptop size={28} />
+                  <Laptop size={24} />
                 </span>
               </div>
 
               <span
-                className={`hidden lg:block text-xl font-bold ${isDarkMode ? "text-white" : "text-gray-900"
+                className={`hidden lg:block text-xl font-extrabold tracking-tight ${isDarkMode ? "text-white" : "text-gray-900"
                   }`}
               >
-                Oceon<span className="text-white">Of</span>Laptops
+                Oceon<span className="text-blue-500">Of</span>Laptops
               </span>
             </div>
           </div>
@@ -119,77 +132,79 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
               <div
                 key={link}
                 onClick={() => navigate(link !== "Home" ? `/${link.toLowerCase()}` : '/')}
-                className={`font-medium transition-colors cursor-pointer ${isDarkMode
-                  ? "text-gray-100 hover:text-white"
-                  : "text-gray-100 hover:text-gray-900"
+                className={`relative font-medium text-sm tracking-wide transition-colors cursor-pointer group ${isDarkMode
+                  ? "text-gray-300 hover:text-white"
+                  : "text-gray-600 hover:text-gray-900"
                   }`}
               >
                 {link}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
               </div>
             ))}
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-4">
-            <div
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <button
               onClick={() => navigate('/user/features/account')}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${isDarkMode
-                ? "text-gray-100 hover:bg-gray-800"
-                : "text-gray-100 hover:bg-gray-100  hover:text-gray-900"
+              className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDarkMode
+                ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 }`}
             >
               <User size={20} />
-            </div>
+            </button>
 
-            <div
+            <button
               onClick={() => navigate('/user/features/wishlist')}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${isDarkMode
-                ? "text-gray-100 hover:bg-gray-800"
-                : "text-gray-100 hover:bg-gray-100  hover:text-gray-900"
+              className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDarkMode
+                ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                 }`}
             >
-              <Heart size={24} />
-            </div>
-
-            <div
-              onClick={() => navigate('/user/features/cart')}
-              className={`p-2 rounded-lg transition-colors cursor-pointer ${isDarkMode
-                ? "text-gray-100 hover:bg-gray-800"
-                : "text-gray-100 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-            >
-              <div className="relative cursor-pointer">
-                <ShoppingCart size={24} className="text-gray-white" />
-
-                {/* <span
-                  className="
-      absolute
-      -top-2
-      -right-2
-      flex
-      items-center
-      justify-center
-      min-w-5
-      h-5
-      px-1
-      rounded-full
-      bg-blue-600
-      text-white
-      text-[10px]
-      font-semibold
-      leading-none
-    "
-                >
-                  5
-                </span> */}
+              <div className="relative">
+                <Heart size={20} />
+                {wishlistCount > 0 && (
+                  <span
+                    className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${
+                      isDarkMode
+                        ? "bg-blue-600 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {wishlistCount}
+                  </span>
+                )}
               </div>
+            </button>
 
-            </div>
+            <button
+              onClick={() => navigate('/user/features/cart')}
+              className={`p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDarkMode
+                ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+            >
+              <div className="relative">
+                <ShoppingCart size={20} />
+                {cartCount > 0 && (
+                  <span
+                    className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${
+                      isDarkMode
+                        ? "bg-blue-600 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {cartCount}
+                  </span>
+                )}
+              </div>
+            </button>
 
             {!Cookies.get('access_token') && (
-              <div onClick={() => navigate('/user/signin')}>
-                <button className="px-3 py-1 rounded-full text-blue text-sm border-2 flex justify-center place-items-center">
-                  Signin
+              <div onClick={() => navigate('/user/signin')} className="ml-2">
+                <button className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5 flex justify-center items-center">
+                  Sign In
                 </button>
               </div>
             )}
@@ -197,9 +212,9 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
             {Cookies.get('access_token') && (
               <button
                 onClick={handleLogout}
-                className={`p-2 rounded-lg transition-colors ${isDarkMode
-                  ? "text-gray-100 hover:bg-gray-800"
-                  : "text-gray-100 hover:bg-gray-100  hover:text-gray-900"
+                className={`ml-2 p-2 rounded-full transition-all duration-300 hover:scale-110 ${isDarkMode
+                  ? "text-gray-300 hover:bg-red-500/20 hover:text-red-400"
+                  : "text-gray-600 hover:bg-red-50 hover:text-red-500"
                   }`}
               >
                 <LogOut size={20} />
@@ -210,22 +225,29 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
       </div>
 
       {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div
-          className={`md:hidden fixed inset-0 z-50 ${isDarkMode ? "bg-gray-900" : "bg-white"
-            }`}
-        >
-          <div className="p-4">
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className={`mb-4 p-2 rounded-lg ${isDarkMode
-                ? "text-gray-100 hover:bg-gray-800"
-                : "text-gray-100 hover:bg-gray-100"
-                }`}
-            >
-              <X size={24} />
-            </button>
-            <div className="flex flex-col space-y-4">
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className={`md:hidden absolute top-[70px] left-0 w-full z-40 border-b shadow-lg ${isDarkMode ? "bg-gray-900 border-gray-800" : "bg-white border-gray-200"
+              }`}
+          >
+            <div className="p-4 flex flex-col space-y-4">
+              <div className="flex justify-between items-center mb-2">
+                <span className={`font-bold text-lg ${isDarkMode ? "text-white" : "text-gray-900"}`}>Menu</span>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`p-2 rounded-full transition-colors ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    }`}
+                >
+                  <X size={24} />
+                </button>
+              </div>
               {navLinks.map((link) => (
                 <div
                   key={link}
@@ -233,18 +255,18 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
                     navigate(link !== "Home" ? `/${link.toLowerCase()}` : '/');
                     setIsMenuOpen(false);
                   }}
-                  className={`text-lg font-medium cursor-pointer ${isDarkMode
-                    ? "text-gray-300 hover:text-white"
-                    : "text-gray-600 hover:text-gray-900"
+                  className={`text-lg font-medium cursor-pointer p-3 rounded-lg transition-colors ${isDarkMode
+                    ? "text-gray-300 hover:bg-gray-800 hover:text-white"
+                    : "text-gray-600 hover:bg-blue-50 hover:text-blue-600"
                     }`}
                 >
                   {link}
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

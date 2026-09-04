@@ -4,6 +4,9 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { axiosInstance } from "../../api/axiosConfig";
 import {toast} from 'sonner';
 import Cookies from 'js-cookie'
+import { motion } from "framer-motion";
+import Breadcrumbs from '../../pages/others/commonReusableComponents/breadCrumbs';
+
 const ResetPassword = ({linkFrom = "security",role = "user"}) => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -96,29 +99,38 @@ const ResetPassword = ({linkFrom = "security",role = "user"}) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg flex overflow-hidden">
-        <div className="w-1/2 bg-blue-50 p-8 hidden md:flex items-center justify-center">
-          <img
-            src="/forgetpassword.jpg"
-            alt="Reset Password Illustration"
-            className="max-w-full h-auto"
-          />
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-5xl mb-6">
+        <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }, { label: 'Security', path: '/user/features/account/security' }, { label: 'Reset Password', path: '/user/features/account/security/reset-password' }]} />
+      </div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="max-w-5xl w-full bg-white rounded-[2.5rem] shadow-2xl flex overflow-hidden border border-gray-100"
+      >
+        <div className="w-1/2 bg-gradient-to-br from-blue-50 to-blue-100 p-12 hidden md:flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+          <div className="absolute -bottom-8 -left-8 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+          <img src="/forgetpassword.jpg" alt="Reset Password Illustration" className="max-w-full h-auto relative z-10 drop-shadow-xl rounded-2xl mix-blend-multiply" />
         </div>
-        <div className="w-full md:w-1/2 p-8">
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800">Set New Password</h2>
-            <p className="text-gray-600">
-              {successMessage
-                ? "Your password has been successfully reset."
-                : "Please enter your new password."}
-            </p>
-            {/* {errorMessage && <div className="text-red-500 text-sm">{errorMessage}</div>} */}
-            {successMessage && <div className="text-green-500 text-sm">{successMessage}</div>}
+        <div className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center bg-white relative z-10">
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Set New Password</h2>
+              <p className="text-gray-500 font-medium mt-3 leading-relaxed">
+                {successMessage
+                  ? "Your password has been successfully reset."
+                  : "Please enter your new password."}
+              </p>
+            </div>
+
+            {successMessage && <div className="p-4 bg-green-50 text-green-600 rounded-xl text-sm font-semibold border border-green-100">{successMessage}</div>}
+            
             {!successMessage && (
-              <form onSubmit={handleResetPassword} className="space-y-4" noValidate>
+              <form onSubmit={handleResetPassword} className="space-y-6 mt-4" noValidate>
                 <div className="space-y-2">
-                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="newPassword" className="block text-xs font-bold text-gray-500 uppercase tracking-wide">
                     New Password
                   </label>
                   <input
@@ -126,7 +138,7 @@ const ResetPassword = ({linkFrom = "security",role = "user"}) => {
                     name="newPassword"
                     type="password"
                     placeholder="Enter new password"
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
@@ -136,7 +148,7 @@ const ResetPassword = ({linkFrom = "security",role = "user"}) => {
                 <div className="space-y-2">
                   <label
                     htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-700"
+                    className="block text-xs font-bold text-gray-500 uppercase tracking-wide"
                   >
                     Confirm Password
                   </label>
@@ -145,24 +157,26 @@ const ResetPassword = ({linkFrom = "security",role = "user"}) => {
                     name="confirmPassword"
                     type="password"
                     placeholder="Confirm new password"
-                    className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     minLength={8}
                   />
                 </div>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   type="submit"
-                  className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md shadow-blue-200 hover:bg-blue-700 transition-all flex justify-center items-center mt-4"
                 >
                   Reset Password
-                </button>
+                </motion.button>
               </form>
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

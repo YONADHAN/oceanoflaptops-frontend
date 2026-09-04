@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import {axiosInstance }from '../../api/axiosConfig'
+import { axiosInstance } from '../../api/axiosConfig'
 
 const ProductComparison = () => {
   const [activeTab, setActiveTab] = useState('product1');
@@ -116,50 +116,50 @@ const ProductComparison = () => {
 
   // Function to render comparison row
   const ComparisonRow = ({ label, value1, value2 }) => (
-    <div className="grid grid-cols-3 border-b border-gray-200 hover:bg-gray-50 transition-colors">
-      <div className="px-4 py-3 font-medium text-gray-900">{label}</div>
-      <div className="px-4 py-3 text-gray-600">{value1}</div>
-      <div className="px-4 py-3 text-gray-600">{value2}</div>
+    <div className="grid grid-cols-3 border-b border-gray-100 hover:bg-blue-50/50 transition-colors duration-200">
+      <div className="px-6 py-4 font-semibold text-gray-700 bg-gray-50/50 flex items-center">{label}</div>
+      <div className="px-6 py-4 text-gray-600 flex items-center border-l border-r border-gray-100">{value1}</div>
+      <div className="px-6 py-4 text-gray-600 flex items-center">{value2}</div>
     </div>
   );
 
   // Mobile card view for a single product
   const ProductCard = ({ product }) => (
-    <div className="bg-white rounded-lg shadow-lg p-4 mb-4">
-      <div className="border-b border-gray-200 pb-3 mb-4">
-        <h3 className="text-lg font-semibold">{product.productName}</h3>
+    <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 mb-6">
+      <div className="border-b border-gray-100 pb-4 mb-5">
+        <h3 className="text-xl font-bold text-gray-900">{product.productName}</h3>
       </div>
-      <div className="space-y-2">
-        <div className="grid grid-cols-2 gap-2">
-          <div className="text-sm font-medium">Brand</div>
-          <div className="text-sm">{product.brand}</div>
-          
-          <div className="text-sm font-medium">Processor</div>
-          <div className="text-sm">{product.processor.model}</div>
-          
-          <div className="text-sm font-medium">RAM</div>
-          <div className="text-sm">{product.ram.size}</div>
-          
-          <div className="text-sm font-medium">Storage</div>
-          <div className="text-sm">{product.storage.capacity}</div>
-          
-          <div className="text-sm font-medium">Graphics</div>
-          <div className="text-sm">{product.graphics.model}</div>
-          
-          <div className="text-sm font-medium">Display</div>
-          <div className="text-sm">{product.display.size}" - {product.display.resolution}</div>
-          
-          <div className="text-sm font-medium">OS</div>
-          <div className="text-sm">{product.operatingSystem}</div>
-          
-          <div className="text-sm font-medium">Battery Life</div>
-          <div className="text-sm">{product.batteryLife} hrs</div>
-          
-          <div className="text-sm font-medium">Weight</div>
-          <div className="text-sm">{product.weight} kg</div>
-          
-          <div className="text-sm font-medium">Price</div>
-          <div className="text-sm">₹{product.salePrice.toLocaleString()}</div>
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-y-4 gap-x-2">
+          <div className="text-sm font-semibold text-gray-500">Brand</div>
+          <div className="text-sm text-gray-900 font-medium">{product.brand}</div>
+
+          <div className="text-sm font-semibold text-gray-500">Processor</div>
+          <div className="text-sm text-gray-900 font-medium">{product.processor.model}</div>
+
+          <div className="text-sm font-semibold text-gray-500">RAM</div>
+          <div className="text-sm text-gray-900 font-medium">{product.ram.size}</div>
+
+          <div className="text-sm font-semibold text-gray-500">Storage</div>
+          <div className="text-sm text-gray-900 font-medium">{product.storage.capacity}</div>
+
+          <div className="text-sm font-semibold text-gray-500">Graphics</div>
+          <div className="text-sm text-gray-900 font-medium">{product.graphics.model}</div>
+
+          <div className="text-sm font-semibold text-gray-500">Display</div>
+          <div className="text-sm text-gray-900 font-medium">{product.display.size}" - {product.display.resolution}</div>
+
+          <div className="text-sm font-semibold text-gray-500">OS</div>
+          <div className="text-sm text-gray-900 font-medium">{product.operatingSystem}</div>
+
+          <div className="text-sm font-semibold text-gray-500">Battery Life</div>
+          <div className="text-sm text-gray-900 font-medium">{product.batteryLife} hrs</div>
+
+          <div className="text-sm font-semibold text-gray-500">Weight</div>
+          <div className="text-sm text-gray-900 font-medium">{product.weight} kg</div>
+
+          <div className="text-sm font-semibold text-gray-500">Price</div>
+          <div className="text-sm text-blue-600 font-bold">₹{product.salePrice.toLocaleString()}</div>
         </div>
       </div>
     </div>
@@ -168,24 +168,22 @@ const ProductComparison = () => {
   const ComparisonContent = ({ laptop1, laptop2 }) => (
     <>
       {/* Mobile View (< 768px) */}
-      <div className="block md:hidden">      
-        <div className="flex mb-4 bg-gray-100 rounded-lg p-1">
+      <div className="block md:hidden">
+        <div className="flex mb-6 bg-gray-100 rounded-xl p-1.5 shadow-inner">
           <button
-            className={`flex-1 py-2 px-4 rounded-md transition-colors ${
-              activeTab === 'product1'
-                ? 'bg-white shadow-sm'
-                : 'hover:bg-gray-200'
-            }`}
+            className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'product1'
+                ? 'bg-white shadow-md text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+              }`}
             onClick={() => setActiveTab('product1')}
           >
             {laptop1.productName}
           </button>
           <button
-            className={`flex-1 py-2 px-4 rounded-md transition-colors ${
-              activeTab === 'product2'
-                ? 'bg-white shadow-sm'
-                : 'hover:bg-gray-200'
-            }`}
+            className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all duration-200 ${activeTab === 'product2'
+                ? 'bg-white shadow-md text-blue-600'
+                : 'text-gray-500 hover:text-gray-700'
+              }`}
             onClick={() => setActiveTab('product2')}
           >
             {laptop2.productName}
@@ -195,46 +193,56 @@ const ProductComparison = () => {
           {activeTab === 'product1' && <ProductCard product={laptop1} />}
           {activeTab === 'product2' && <ProductCard product={laptop2} />}
         </div>
-        <div className="p-1 bg-gray-200" onClick={handleCloseComparisonModule}>close</div>
+        <button
+          className="w-full py-4 mt-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold rounded-xl transition-colors"
+          onClick={handleCloseComparisonModule}
+        >
+          Close Comparison
+        </button>
       </div>
 
       {/* Tablet/Desktop View (≥ 768px) */}
       <div className="hidden md:block">
-        <div className="bg-white rounded-lg shadow-lg">
-          <div className="p-6 border-b border-gray-200 flex justify-between">
-            <h2 className="text-2xl font-bold">Product Comparison</h2>
-            <div className="p-1 bg-gray-200" onClick={handleCloseComparisonModule}>close</div>
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div className="p-6 md:p-8 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <h2 className="text-2xl font-extrabold text-gray-900">Detailed Specifications</h2>
+            <button
+              className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm font-semibold transition-colors"
+              onClick={handleCloseComparisonModule}
+            >
+              Clear Comparison
+            </button>
           </div>
-          <div className="p-6">
-            <div className="grid grid-cols-3 border-b-2 border-gray-200 pb-2 mb-2">
-              <div className="px-4 py-2 font-bold">Feature</div>
-              <div className="px-4 py-2 font-bold">{laptop1.productName}</div>
-              <div className="px-4 py-2 font-bold">{laptop2.productName}</div>
+          <div className="p-0">
+            <div className="grid grid-cols-3 border-b-2 border-gray-100 bg-gray-50">
+              <div className="px-6 py-4 font-bold text-gray-400 uppercase tracking-wider text-xs">Feature</div>
+              <div className="px-6 py-4 font-bold text-blue-600 text-lg border-l border-r border-gray-100">{laptop1.productName}</div>
+              <div className="px-6 py-4 font-bold text-blue-600 text-lg">{laptop2.productName}</div>
             </div>
-            
+
             <ComparisonRow label="Brand" value1={laptop1.brand} value2={laptop2.brand} />
             <ComparisonRow label="Processor" value1={laptop1.processor.model} value2={laptop2.processor.model} />
             <ComparisonRow label="RAM" value1={laptop1.ram.size} value2={laptop2.ram.size} />
             <ComparisonRow label="Storage" value1={laptop1.storage.capacity} value2={laptop2.storage.capacity} />
             <ComparisonRow label="Graphics" value1={laptop1.graphics.model} value2={laptop2.graphics.model} />
-            <ComparisonRow 
-              label="Display" 
+            <ComparisonRow
+              label="Display"
               value1={`${laptop1.display.size}" - ${laptop1.display.resolution}`}
               value2={`${laptop2.display.size}" - ${laptop2.display.resolution}`}
             />
             <ComparisonRow label="OS" value1={laptop1.operatingSystem} value2={laptop2.operatingSystem} />
-            <ComparisonRow 
-              label="Battery Life" 
+            <ComparisonRow
+              label="Battery Life"
               value1={`${laptop1.batteryLife} hrs`}
               value2={`${laptop2.batteryLife} hrs`}
             />
-            <ComparisonRow 
-              label="Weight" 
+            <ComparisonRow
+              label="Weight"
               value1={`${laptop1.weight} kg`}
               value2={`${laptop2.weight} kg`}
             />
-            <ComparisonRow 
-              label="Price" 
+            <ComparisonRow
+              label="Price"
               value1={`₹${laptop1.salePrice.toLocaleString()}`}
               value2={`₹${laptop2.salePrice.toLocaleString()}`}
             />
@@ -245,52 +253,63 @@ const ProductComparison = () => {
   );
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 bg-gray-200">
-      <div className="text-2xl text-blue-500 my-3">Choose the most suitable one </div>
+    <div className="w-full max-w-7xl mx-auto p-6 md:p-10 bg-white rounded-3xl shadow-xl my-12 border border-gray-100 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-blue-800"></div>
+      <div className="mb-10 text-center">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Compare Laptops</h2>
+        <p className="text-lg text-gray-500">Find the perfect match for your needs by comparing specifications side-by-side.</p>
+      </div>
+
       {/* Search Section */}
-      <div className="mb-6 space-y-4 md:space-y-0 md:flex md:gap-4">
+      <div className="mb-10 p-6 bg-gray-50 rounded-2xl flex flex-col md:flex-row gap-4 items-center border border-gray-100">
         {/* First Laptop Search */}
-        <div className="relative w-full md:w-1/3">
+        <div className="relative w-full md:w-2/5">
           <input
             type="text"
-            placeholder="Enter first laptop name"
-            className="w-full p-2 border rounded"
+            placeholder="Search first laptop..."
+            className="w-full px-5 py-4 border-2 border-transparent bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all text-gray-700"
             value={laptop1Name}
             onChange={(e) => handleLaptop1Search(e.target.value)}
           />
           {Array.isArray(suggestions1) && suggestions1.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
+            <div className="absolute z-20 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden">
               {suggestions1.map((product) => (
                 <div
                   key={product._id}
-                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  className="p-4 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0"
                   onClick={() => handleSelectSuggestion(product, true)}
                 >
-                  {product.productName} - {product.brand}
+                  <div className="font-semibold text-gray-900">{product.productName}</div>
+                  <div className="text-sm text-gray-500">{product.brand}</div>
                 </div>
               ))}
             </div>
           )}
         </div>
 
+        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm shrink-0 shadow-sm">
+          VS
+        </div>
+
         {/* Second Laptop Search */}
-        <div className="relative w-full md:w-1/3">
+        <div className="relative w-full md:w-2/5">
           <input
             type="text"
-            placeholder="Enter second laptop name"
-            className="w-full p-2 border rounded"
+            placeholder="Search second laptop..."
+            className="w-full px-5 py-4 border-2 border-transparent bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all text-gray-700"
             value={laptop2Name}
             onChange={(e) => handleLaptop2Search(e.target.value)}
           />
           {Array.isArray(suggestions2) && suggestions2.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white border rounded-md shadow-lg">
+            <div className="absolute z-20 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden">
               {suggestions2.map((product) => (
                 <div
                   key={product._id}
-                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  className="p-4 hover:bg-blue-50 cursor-pointer transition-colors border-b border-gray-50 last:border-0"
                   onClick={() => handleSelectSuggestion(product, false)}
                 >
-                  {product.productName} - {product.brand}
+                  <div className="font-semibold text-gray-900">{product.productName}</div>
+                  <div className="text-sm text-gray-500">{product.brand}</div>
                 </div>
               ))}
             </div>
@@ -305,32 +324,35 @@ const ProductComparison = () => {
               setError("Please select both laptops to compare");
             }
           }}
-          className="w-full md:w-auto bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
+          className="w-full md:w-1/5 bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           disabled={!selectedLaptops.laptop1 || !selectedLaptops.laptop2}
         >
-          Compare
+          Compare Now
         </button>
-        
       </div>
 
       {error && (
-        <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center">
+          <svg className="w-5 h-5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
           {error}
         </div>
       )}
 
       {loading && (
-        <div className="mb-4 p-2 bg-blue-100 text-blue-700 rounded">
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-xl flex items-center animate-pulse">
+          <svg className="w-5 h-5 mr-3 flex-shrink-0 animate-spin" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
           Loading suggestions...
         </div>
       )}
 
       {/* Comparison Section */}
       {selectedLaptops.laptop1 && selectedLaptops.laptop2 && (
-        <ComparisonContent
-          laptop1={selectedLaptops.laptop1}
-          laptop2={selectedLaptops.laptop2}
-        />
+        <div className="mt-8 animate-fadeIn">
+          <ComparisonContent
+            laptop1={selectedLaptops.laptop1}
+            laptop2={selectedLaptops.laptop2}
+          />
+        </div>
       )}
     </div>
   );

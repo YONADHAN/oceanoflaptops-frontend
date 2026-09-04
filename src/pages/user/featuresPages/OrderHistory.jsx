@@ -6,6 +6,7 @@ import { axiosInstance } from "../../../api/axiosConfig";
 import {orderService} from "../../../apiServices/userApiServices"
 import Table from "../../../components/MainComponents/Table";
 import Pagination from "../../../components/MainComponents/Pagination";
+import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
 
 const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
@@ -150,7 +151,10 @@ const OrderHistory = () => {
 
   if (orders.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <div className="container mx-auto px-4 py-8 flex flex-col items-center justify-center min-h-screen gap-4">
+        <div className="w-full mb-6 self-start">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Orders', path: '/user/features/order' }]} />
+        </div>
         <h2 className="text-2xl font-semibold text-gray-700">No Orders Found</h2>
         <button
           onClick={() => navigate("/user/shop")}
@@ -164,6 +168,9 @@ const OrderHistory = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Orders', path: '/user/features/order' }]} />
+      </div>
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Order History</h1>
       <Table
         columns={columns}

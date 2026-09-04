@@ -6,8 +6,13 @@ import { toast } from "sonner";
 import {jwtDecode} from "jwt-decode";
 import Cookies from "js-cookie";
 import Pagination from "../../../components/MainComponents/Pagination";
+import { useDispatch } from "react-redux";
+import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
+import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice";
+import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
 
 const Wishlist = () => {
+    const dispatch = useDispatch();
     const [wishlist, setWishlist] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -48,6 +53,7 @@ const Wishlist = () => {
             const response = await cartService.addToCart(id, 1);
             if (response.status === 200) {
                 toast.success("Product added to cart");
+                dispatch(fetchCartCountAsync());
                 handleRemove(id);
             }
         } catch (error) {
@@ -66,6 +72,7 @@ const Wishlist = () => {
             if (response.status === 200) {
                 toast.success("Product removed from wishlist");
                 fetchWishlist(currentPage);
+                dispatch(fetchWishlistCountAsync());
             }
         } catch (error) {
             toast.error("Error while removing product");
@@ -174,7 +181,10 @@ const Wishlist = () => {
     };
 
     return (
-        <div>
+        <div className="container mx-auto px-4 py-8">
+            <div className="mb-6">
+                <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Wishlist', path: '/user/features/wishlist' }]} />
+            </div>
             <h2 className="text-2xl font-bold mb-4">Wishlist</h2>
             {isLoading ? (
                 <div>Loading...</div>

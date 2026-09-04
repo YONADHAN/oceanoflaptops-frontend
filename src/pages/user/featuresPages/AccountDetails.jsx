@@ -90,6 +90,7 @@ import {
   Shield,
   ChevronRight,
 } from "lucide-react";
+import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
 
 const baseURL = "/user/features/account";
 
@@ -132,6 +133,9 @@ const AccountSettings = () => {
   return (
     <div className="min-h-11/12 bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-6">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }]} />
+        </div>
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Your Account</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

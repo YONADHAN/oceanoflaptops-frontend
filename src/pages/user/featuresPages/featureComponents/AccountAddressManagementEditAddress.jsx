@@ -5,6 +5,7 @@ import {authService} from '../../../../apiServices/userApiServices'
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import AddressForm from './AccountAddressManagementAddressForm';
+import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const EditAddress = ({ redirectToCheckout = false, onSuccess, addressFromCheckout }) => {
  
@@ -91,6 +92,9 @@ const EditAddress = ({ redirectToCheckout = false, onSuccess, addressFromCheckou
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }, { label: 'Address', path: '/user/features/account/addresses' }, { label: 'Edit', path: `/user/features/account/addresses/edit/${id}` }]} />
+      </div>
       <h1 className="text-3xl font-bold mb-8">Edit Address</h1>
       <AddressForm 
         purpose={"edit_address"}

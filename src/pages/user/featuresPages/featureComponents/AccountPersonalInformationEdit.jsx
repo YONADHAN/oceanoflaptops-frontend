@@ -9,6 +9,8 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
+import { motion } from "framer-motion";
+import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const PersonalInformationPage = () => {
   const [errors, setErrors] = useState({});
@@ -339,12 +341,17 @@ const PersonalInformationPage = () => {
     };
 
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4 py-2">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="max-w-4xl mx-auto p-4 md:p-8 space-y-8 min-h-screen"
+      >
         {showCropModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg max-w-2xl w-full">
-              <h2 className="text-xl font-bold mb-4">Crop Profile Picture</h2>
-              <div className="max-h-[60vh] overflow-auto">
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white p-8 rounded-2xl max-w-2xl w-full shadow-2xl">
+              <h2 className="text-2xl font-bold mb-6 text-gray-900">Crop Profile Picture</h2>
+              <div className="max-h-[60vh] overflow-auto flex justify-center bg-gray-50 rounded-xl p-4">
                 {Boolean(imgSrc) && (
                   <div className="flex flex-col items-center">
                     <ReactCrop
@@ -359,16 +366,15 @@ const PersonalInformationPage = () => {
                         alt="Crop me"
                         src={imgSrc}
                         onLoad={onImageLoad}
-                        className="max-h-[60vh] object-contain"
+                        className="max-h-[50vh] object-contain rounded-lg"
                       />
                     </ReactCrop>
-                    <div className="mt-4">
+                    <div className="mt-6">
                       <canvas
                         ref={previewCanvasRef}
-                        className="w-[150px] h-[150px] rounded-full"
+                        className="w-[120px] h-[120px] rounded-full shadow-md ring-4 ring-white"
                         style={{
-                          border: "1px solid black",
-                          objectFit: "contain",
+                          objectFit: "cover",
                           display: !completedCrop ? "none" : "block",
                         }}
                       />
@@ -376,227 +382,179 @@ const PersonalInformationPage = () => {
                   </div>
                 )}
               </div>
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-8 flex justify-end gap-3">
                 <button
                   onClick={() => {
                     setShowCropModal(false);
                     setImgSrc("");
                   }}
-                  className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                  className="px-6 py-2.5 font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all"
                   disabled={isLoading}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveCrop}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-6 py-2.5 font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-sm shadow-blue-200 transition-all"
                   disabled={
                     isLoading || !completedCrop?.width || !completedCrop?.height
                   }
                 >
-                  {isLoading ? "Saving..." : "Save"}
+                  {isLoading ? "Saving..." : "Save Crop"}
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Rest of your existing JSX for the form */}
-        <div className="bg-white pb-16 p-8 rounded-lg shadow-md w-full max-w-4xl flex flex-col md:flex-row gap-8">
-          {/* Profile Picture Section */}
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-8 mt-6 text-center">
-              Personal Information
-            </h1>
+        {/* Header Section */}
+        <div className="mb-2">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }, { label: 'Personal Info', path: '/user/features/account/personal_info' }, { label: 'Edit', path: '/user/features/account/personal_info/edit' }]} />
+        </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Edit Profile</h1>
+          <p className="text-gray-500 mt-2">Update your personal information</p>
+        </div>
 
-            <div className="mb-6 flex justify-center">
-              <div className="relative">
-                <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                  {formData.profilePic ? (
-                    <img
-                      src={formData.profilePic}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <svg
-                      className="w-16 h-16 text-gray-400"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <button
-                  onClick={() => fileInputRef.current.click()}
-                  disabled={isLoading}
-                  className="absolute bottom-0 right-0 bg-blue-500 rounded-full p-2 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+        {/* Form Section */}
+        <div className="bg-white rounded-[2rem] shadow-xl shadow-blue-100/20 border border-gray-100/50 p-6 md:p-8">
+          <div className="flex flex-col md:flex-row gap-10">
+            {/* Left side: Avatar & Basic Info */}
+            <div className="flex-1 space-y-8">
+              <div className="flex flex-col items-center md:items-start pt-2">
+                <div className="relative group">
+                  <div className="w-40 h-40 overflow-hidden bg-gradient-to-br from-blue-50 to-blue-100 rounded-[2rem] flex items-center justify-center ring-4 ring-white shadow-xl transition-all duration-300 group-hover:shadow-blue-200">
+                    {formData.profilePic ? (
+                      <img src={formData.profilePic} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <svg className="w-20 h-20 text-blue-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => fileInputRef.current.click()}
+                    disabled={isLoading}
+                    className="absolute -bottom-4 -right-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl p-4 shadow-lg transition-all disabled:opacity-50 hover:scale-110"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                </button>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={onSelectFile}
-                  className="hidden"
-                  accept="image/*"
-                />
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </button>
+                  <input type="file" ref={fileInputRef} onChange={onSelectFile} className="hidden" accept="image/*" />
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900"
+                  />
+                  {errors.name && <p className="mt-2 text-sm text-red-500 font-medium">{errors.name}</p>}
+                </div>
+
+                <div onClick={emailNotEditableMessage} className="select-none">
+                  <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide flex items-center gap-2">Email <span className="text-[10px] bg-gray-200 text-gray-600 px-2 py-0.5 rounded-md">Not editable</span></label>
+                  <input
+                    type="email"
+                    name="email"
+                    disabled
+                    value={formData.email}
+                    className="w-full px-5 py-3.5 bg-gray-100 border border-gray-200 rounded-xl outline-none text-base font-semibold text-gray-500 cursor-not-allowed"
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Rest of your form fields */}
-            <div className="space-y-4">
+            {/* Right side: Other Info */}
+            <div className="flex-1 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                {errors.name && (
-                  <div className="text-red-500">{errors.name}</div>
-                )}
-              </div>
-
-              <div onClick={emailNotEditableMessage} className="select-none">
-                <label className="block text-sm font-medium text-gray-700">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  //not editable
-
-                  disabled
-                  value={formData.email}
-                  // onChange={handleInputChange}
-
-                  className="mt-1 select-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-300"
-                />
-                {errors.email && (
-                  <div className="text-red-500">{errors.email}</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Right side */}
-          <div className="flex-1">
-            <div className="space-y-4 mt-20">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Gender
-                </label>
-                <select
-                  name="gender"
-                  value={formData.gender}
-                  onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Gender</label>
+                <div className="relative">
+                  <select
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleInputChange}
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900 appearance-none"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Birthday
-                </label>
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Birthday</label>
                 <input
                   type="date"
                   name="birthday"
                   value={formData.birthday}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900"
                 />
-                {errors.birthday && (
-                  <div className="text-red-500">{errors.birthday}</div>
-                )}
+                {errors.birthday && <p className="mt-2 text-sm text-red-500 font-medium">{errors.birthday}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Mobile Number
-                </label>
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Mobile Number</label>
                 <input
                   type="tel"
                   name="mobileNumber"
                   value={formData.mobileNumber}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900"
                 />
-                {errors.mobileNumber && (
-                  <div className="text-red-500">{errors.mobileNumber}</div>
-                )}
+                {errors.mobileNumber && <p className="mt-2 text-sm text-red-500 font-medium">{errors.mobileNumber}</p>}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Language
-                </label>
+                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wide">Language</label>
                 <input
                   type="text"
                   name="language"
                   value={formData.language}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900"
                 />
-                {errors.language && (
-                  <div className="text-red-500">{errors.language}</div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <div className="mt-9 flex justify-end gap-2">
-                <button
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                  className="bg-gray-500 text-white px-6 py-3 rounded-md shadow-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isLoading}
-                  className="bg-blue-500 text-white px-6 py-3 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
-                >
-                  {isLoading ? "Saving..." : "Save"}
-                </button>
+                {errors.language && <p className="mt-2 text-sm text-red-500 font-medium">{errors.language}</p>}
               </div>
             </div>
           </div>
+
+          <div className="mt-10 pt-8 border-t border-gray-100 flex justify-end gap-4">
+            <button
+              onClick={handleCancel}
+              disabled={isLoading}
+              className="px-8 py-3.5 font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all disabled:opacity-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={isLoading}
+              className="px-8 py-3.5 font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-200 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Saving...
+                </>
+              ) : "Save Changes"}
+            </button>
+          </div>
         </div>
-      </div>
+      </motion.div>
     );
   };
 export default PersonalInformationPage;

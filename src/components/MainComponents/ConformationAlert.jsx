@@ -1,31 +1,36 @@
 import React from "react";
 
-const ConfirmationAlert = ({ 
-  show, 
-  title, 
-  message, 
-  onCancel, 
-  onProceed, 
-  noText = "No", 
-  yesText = "Yes" 
+const ConfirmationAlert = ({
+  show,
+  title,
+  message,
+  onCancel,
+  onProceed,
+  noText = "No",
+  yesText = "Yes",
+  proceedDisabled = false
 }) => {
-  if (!show) return null; 
+  if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
-        <div className="text-gray-600 mt-2">{message}</div>
-        <div className="flex justify-end gap-4 mt-6">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-2xl shadow-xl w-[28rem] animate-in zoom-in-95 duration-200">
+        <h1 className="text-xl font-bold text-gray-900">{title}</h1>
+        <div className="text-gray-600 mt-3">{message}</div>
+        <div className="flex justify-end gap-3 mt-8">
           <button
             onClick={onCancel}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none"
+            className="px-5 py-2.5 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 focus:outline-none transition-colors"
           >
             {noText}
           </button>
           <button
             onClick={onProceed}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 focus:outline-none"
+            disabled={proceedDisabled}
+            className={`px-5 py-2.5 font-medium rounded-xl focus:outline-none transition-all ${proceedDisabled
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm shadow-indigo-200 hover:shadow-md'
+              }`}
           >
             {yesText}
           </button>

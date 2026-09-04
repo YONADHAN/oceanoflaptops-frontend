@@ -8,6 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../api/axiosConfig";
 import { toast } from "sonner";
 import { jwtDecode as jwt_decode } from "jwt-decode";
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchCartCountAsync } from "../../redux/slices/cartSlice";
+import { fetchWishlistCountAsync } from "../../redux/slices/wishlistSlice";
 function ModernNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -61,6 +64,15 @@ function ModernNavbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const dispatch = useDispatch();
+  const cartCount = useSelector((state) => state.cart.count);
+  const wishlistCount = useSelector((state) => state.wishlist.count);
+
+  useEffect(() => {
+    dispatch(fetchCartCountAsync());
+    dispatch(fetchWishlistCountAsync());
+  }, [dispatch]);
 
   return (
     <nav
@@ -184,13 +196,24 @@ function ModernNavbar() {
 
             <a
               href="/user/features/wishlist"
-              className={`transition-colors ${
+              className={`relative transition-colors ${
                 isDarkMode
                   ? "text-slate-300 hover:text-blue-400"
                   : "text-white hover:text-teal-200"
               }`}
             >
               <Heart size={20} />
+              {wishlistCount > 0 && (
+                <span
+                  className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${
+                    isDarkMode
+                      ? "bg-blue-600 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  {wishlistCount}
+                </span>
+              )}
             </a>
 
             <a
@@ -202,15 +225,17 @@ function ModernNavbar() {
               }`}
             >
               <ShoppingCart size={20} />
-              {/* <span
-                className={`absolute -top-2 -right-2 h-4 w-4 text-xs rounded-full flex items-center justify-center ${
-                  isDarkMode
-                    ? "bg-blue-600 text-white"
-                    : "bg-red-500 text-white"
-                }`}
-              >
-                3
-              </span> */}
+              {cartCount > 0 && (
+                <span
+                  className={`absolute -top-2 -right-2 h-4 w-4 text-xs font-bold rounded-full flex items-center justify-center ${
+                    isDarkMode
+                      ? "bg-blue-600 text-white"
+                      : "bg-red-500 text-white"
+                  }`}
+                >
+                  {cartCount}
+                </span>
+              )}
             </a>
 
             <a

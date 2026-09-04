@@ -2,12 +2,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import {cartService} from "../../../apiServices/userApiServices"
+import { cartService } from "../../../apiServices/userApiServices"
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { jwtDecode } from "jwt-decode";
+import { useDispatch } from 'react-redux';
+import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
+import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
+import { motion } from "framer-motion";
 
 export default function ShoppingCart() {
+  const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const [couponCode, setCouponCode] = useState("");
   const [cartData, setCartData] = useState({});
@@ -109,6 +114,7 @@ export default function ShoppingCart() {
         await cartService.removeFromCart(userId, productId)
         setProducts(products.filter((product) => product.id !== id));
         fetchCartData()
+        dispatch(fetchCartCountAsync());
         toast.success("Item removed from cart");
         return;
       }
@@ -139,6 +145,7 @@ export default function ShoppingCart() {
 
       toast.success("Cart updated successfully");
       fetchCartData();
+      dispatch(fetchCartCountAsync());
     } catch (error) {     
       if (error.response?.data?.message === "Product is blocked by the admin") {
         toast.error("This product is currently blocked by the admin");
@@ -166,6 +173,7 @@ export default function ShoppingCart() {
       await cartService.removeFromCart(userId, productId);
       setProducts(products.filter((product) => product.id !== id));
       fetchCartData();
+      dispatch(fetchCartCountAsync());
       toast.success("Item removed from cart");
     } catch (error) {
       toast.error("Error removing item from cart");
@@ -224,23 +232,48 @@ export default function ShoppingCart() {
 
   if (!products.length) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12">
-       
-        <div className="flex flex-col items-center pt-5 relative">
-          <p className="text-xl text-gray-500">Oops! Your cart is empty.</p>
-          <img
-          onClick={() => navigate("/shop")}
+      <div className="max-w-7xl mx-auto px-6 py-12 min-h-[70vh] flex flex-col items-center justify-center">
+        <div className="w-full max-w-3xl mb-6">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Cart', path: '/user/features/cart' }]} />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 30, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="bg-white rounded-[3rem] shadow-2xl p-10 md:p-16 flex flex-col items-center text-center max-w-3xl w-full border border-gray-100 relative overflow-hidden"
+        >
+          {/* Decorative Blobs */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-20 animate-blob"></div>
+          <div className="absolute -bottom-10 -left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-30 animate-blob animation-delay-2000"></div>
+          
+          <motion.img
+            whileHover={{ scale: 1.05, rotate: -2 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            onClick={() => navigate("/shop")}
             src="/e.png"
             alt="Empty Cart"
-            className="w-1/5 h-auto  opacity-90 hover:opacity-100 transition duration-300"
+            className="w-48 h-48 sm:w-64 sm:h-64 object-contain mb-8 cursor-pointer drop-shadow-2xl relative z-10"
           />
-          <button
+          
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight relative z-10">
+            Your cart is feeling light!
+          </h2>
+          <p className="text-gray-500 text-lg mb-10 max-w-md relative z-10 font-medium">
+            It looks like you haven't added any premium tech to your cart yet. Let's find your perfect laptop!
+          </p>
+          
+          <motion.button
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate("/shop")}
-            className="px-3 py-2 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-lg shadow-md hover:shadow-lg hover:bg-blue-600 focus:ring focus:ring-blue-300 transition duration-300 transform hover:scale-105  "
+            className="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all flex items-center gap-3 relative z-10 group"
           >
-            Continue Shopping
-          </button>
-        </div>
+            <svg className="w-5 h-5 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            Explore Premium Laptops
+          </motion.button>
+        </motion.div>
       </div>
     );
   }
@@ -248,6 +281,9 @@ export default function ShoppingCart() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-2">
+      <div className="mb-6">
+        <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Cart', path: '/user/features/cart' }]} />
+      </div>
       <h1 className="text-3xl font-bold mb-8">Your cart</h1>
 
     

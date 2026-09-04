@@ -154,6 +154,8 @@ import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { EyeIcon, EyeOffIcon } from "lucide-react"; // Import icons
+import { motion } from "framer-motion";
+import Breadcrumbs from '../../pages/others/commonReusableComponents/breadCrumbs';
 
 const ResetPasswordPage = () => {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -216,34 +218,46 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <div className="h-11/12 bg-gray-100 flex justify-center items-center">
-      <div className="flex h-4/6 w-4/6">
-        {/* Left side - Image */}
-        <div
-          className="hidden md:flex md:w-1/2 bg-cover bg-center"
-          style={{ backgroundImage: "url('/resetPassword.jpg')" }}
-        ></div>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 sm:p-8">
+      <div className="w-full max-w-5xl mb-6">
+        <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'Account', path: '/user/features/account' }, { label: 'Security', path: '/user/features/account/security' }, { label: 'Change Password', path: '/user/features/account/security/change-password' }]} />
+      </div>
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="max-w-5xl w-full bg-white rounded-[2.5rem] shadow-2xl flex overflow-hidden border border-gray-100"
+      >
+        <div className="w-1/2 bg-gradient-to-br from-blue-50 to-blue-100 p-12 hidden md:flex flex-col items-center justify-center relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+          <div className="absolute -bottom-8 -left-8 w-64 h-64 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+          <img src="/resetPassword.jpg" alt="Change Password Illustration" className="max-w-full h-auto relative z-10 drop-shadow-xl rounded-2xl mix-blend-multiply" />
+        </div>
 
-        {/* Right side - Form */}
-        <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-8">
-          <div className="w-full max-w-md">
-            <h2 className="text-3xl font-bold mb-6 text-gray-900">Reset Password</h2>
+        <div className="w-full md:w-1/2 p-8 sm:p-12 lg:p-16 flex flex-col justify-center bg-white relative z-10">
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Change Password</h2>
+              <p className="text-gray-500 font-medium mt-3 leading-relaxed">
+                Ensure your account is using a long, random password to stay secure.
+              </p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            <form onSubmit={handleSubmit} className="space-y-6 mt-4" noValidate>
               {/* Current Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Current Password</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">Current Password</label>
                 <div className="relative">
                   <input
                     type={showCurrent ? "text" : "password"}
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900 pr-12"
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-3 flex items-center"
+                    className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors"
                     onClick={() => toggleVisibility("current")}
                   >
                     {showCurrent ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
@@ -252,19 +266,19 @@ const ResetPasswordPage = () => {
               </div>
 
               {/* New Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">New Password</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">New Password</label>
                 <div className="relative">
                   <input
                     type={showNew ? "text" : "password"}
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900 pr-12"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-3 flex items-center"
+                    className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors"
                     onClick={() => toggleVisibility("new")}
                   >
                     {showNew ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
@@ -273,19 +287,19 @@ const ResetPasswordPage = () => {
               </div>
 
               {/* Confirm Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+              <div className="space-y-2">
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide">Confirm New Password</label>
                 <div className="relative">
                   <input
                     type={showConfirm ? "text" : "password"}
                     required
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-full px-5 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-base font-semibold transition-all text-gray-900 pr-12"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 right-3 flex items-center"
+                    className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-blue-500 transition-colors"
                     onClick={() => toggleVisibility("confirm")}
                   >
                     {showConfirm ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
@@ -294,18 +308,18 @@ const ResetPasswordPage = () => {
               </div>
 
               {/* Submit Button */}
-              <div>
-                <button
-                  type="submit"
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Reset Password
-                </button>
-              </div>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                className="w-full bg-blue-600 text-white font-bold py-3.5 rounded-xl shadow-md shadow-blue-200 hover:bg-blue-700 transition-all flex justify-center items-center mt-6"
+              >
+                Change Password
+              </motion.button>
             </form>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

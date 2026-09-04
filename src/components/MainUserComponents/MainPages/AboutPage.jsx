@@ -1,11 +1,13 @@
 import React from 'react';
+import Breadcrumbs from '../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const AboutUs = () => {
   return (
-    <div className="bg-blue-50 min-h-screen">
-      
-
-      <main className="container mx-auto px-4 py-12">
+    <div className="bg-blue-50 min-h-screen w-full">
+      <main className="container mx-auto px-4">
+        <div className="mb-8 w-full flex justify-start pt-6">
+          <Breadcrumbs breadcrumbs={[{ label: 'Home', path: '/' }, { label: 'About', path: '/about' }]} />
+        </div>
         <section className="mb-12">
           <h2 className="text-3xl font-semibold text-blue-800 mb-6">About Us</h2>
           <div className="grid md:grid-cols-2 gap-8 items-center">
@@ -71,7 +73,7 @@ const AboutUs = () => {
         </section>
       </main>
 
-     
+
     </div>
   );
 };
