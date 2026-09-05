@@ -27,6 +27,7 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
   const dispatch = useDispatch();
   const cartCount = useSelector((state) => state.cart.count);
   const wishlistCount = useSelector((state) => state.wishlist.count);
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchCartCountAsync());
