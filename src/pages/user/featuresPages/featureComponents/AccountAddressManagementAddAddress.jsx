@@ -17,12 +17,12 @@ const AddAddress = ({ redirectToCheckout = false, onSuccess }) => {
 
       const response = await authService.addAddress(newAddress, userId);
 
-      if (response?.status === 200) {
+      if (response?.status === 200 || response?.status === 201) {
         toast.success('Address added successfully');
         //console.log('Address added successfully');
         if (onSuccess) onSuccess();
         navigate(redirectToCheckout ? '/user/features/cart/checkout' : '/user/features/account/addresses');
-    }
+      }
       
     } catch (error) {
       console.error('Error adding address:', error);

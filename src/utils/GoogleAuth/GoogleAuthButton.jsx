@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { axiosInstance } from "../../api/axiosConfig";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { getPendingReturnTo, clearPendingReturnTo } from "../navigation/returnTo";
 
 const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
     const navigate = useNavigate(); // For redirection
@@ -27,7 +28,13 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
 
                 // Navigate to the user or admin home page based on role
                 if (role === "user") {
-                    navigate("/");
+                    const pendingReturnTo = getPendingReturnTo();
+                    if (pendingReturnTo) {
+                        navigate(pendingReturnTo);
+                        clearPendingReturnTo();
+                    } else {
+                        navigate("/");
+                    }
                 } else if (role === "admin") {
                     navigate("/admin/dashboard");
                 }

@@ -47,7 +47,7 @@ function ModernNavbar() {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 mb-8 ${
+      className={`fixed w-full z-[999] transition-all duration-300 mb-8 ${
         scrolled
           ? isDarkMode
             ? "bg-slate-800/90 text-white shadow-lg backdrop-blur-lg"

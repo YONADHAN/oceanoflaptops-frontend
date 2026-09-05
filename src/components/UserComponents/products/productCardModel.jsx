@@ -1,6 +1,5 @@
 
 
-
 import { useState, useEffect } from "react"
 import { FiHeart, FiShoppingCart } from "react-icons/fi"
 import { AiFillStar } from "react-icons/ai"
@@ -12,6 +11,7 @@ import Cookies from "js-cookie"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice"
 import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice"
+import { savePendingReturnTo } from "../../../utils/navigation/returnTo"
 
 const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
   const dispatch = useDispatch()
@@ -71,6 +71,7 @@ const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
 
     try {
       if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location)
         navigate('/user/signin')
         return
       }
@@ -110,6 +111,7 @@ const ProductCard = ({ product, onProductClick, fromLandingPage = false }) => {
   const AddToCart = async () => {
     try {
       if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate('/user/signin');
         return;
       }

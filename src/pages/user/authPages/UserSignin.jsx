@@ -10,6 +10,7 @@ import { Toaster, toast } from "sonner";
 import GoogleButton from "../../../utils/GoogleAuth/GoogleAuthButton";
 import { authService } from "../../../apiServices/userApiServices";
 import { motion } from "framer-motion";
+import { getPendingReturnTo, clearPendingReturnTo } from "../../../utils/navigation/returnTo";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -66,14 +67,16 @@ const Signin = () => {
         password,
       });
       if (response.status === 200) {
-        // console.log(response.data);
-        // const { accessToken, message } = response.data;
-        // console.log("user_access_token is :", accessToken);
-        // console.log("Sign-in successful:", message);
         toast.success("Sign-in successful");
 
         await dispatch(fetchAuthSession()).unwrap();
-        navigate("/");
+        const pendingReturnTo = getPendingReturnTo();
+        if (pendingReturnTo) {
+          navigate(pendingReturnTo);
+          clearPendingReturnTo();
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       if (error.response) {

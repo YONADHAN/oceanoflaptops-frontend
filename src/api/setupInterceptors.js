@@ -31,14 +31,19 @@ const attachResponseInterceptor = async (
       if (
         originalRequest &&
         (originalRequest.url.includes("/auth/user/me") || originalRequest.url.includes("/auth/admin/me")) &&
-        !(error.response?.status === 401 && error.response?.data?.message === "Token is invalid or expired.")
+        !(
+          (error.response?.status === 401 && error.response?.data?.message === "Token is invalid or expired.") ||
+          (error.response?.status === 403 && error.response?.data?.message === "No token provided.")
+        )
       ) {
         return Promise.reject(error);
       }
 
       if (
-        error.response?.status === 401 &&
-        error.response?.data?.message === "Token is invalid or expired." &&
+        (
+          (error.response?.status === 401 && error.response?.data?.message === "Token is invalid or expired.") ||
+          (error.response?.status === 403 && error.response?.data?.message === "No token provided.")
+        ) &&
         !originalRequest._retry
       ) {
         originalRequest._retry = true;
@@ -61,32 +66,28 @@ const attachResponseInterceptor = async (
         } catch (refreshError) {
           console.error("Refresh Token Error:", refreshError);
           if (refreshError.response && (refreshError.response.status === 401 || refreshError.response.status === 403)) {
-            toast.info("Your Session has expired. Please sign in again.");
-            const role = error.response?.data?.role || "user";
-            switch (role) {
-              case "user":
-                window.location.href = "/user/signin";
-                break;
-              case "admin":
-                window.location.href = "/admin/signin";
-                break;
-              default:
-                window.location.href = "/";
+            const isBootstrapEndpoint = originalRequest && (originalRequest.url.includes("/auth/user/me") || originalRequest.url.includes("/auth/admin/me"));
+            
+            if (!isBootstrapEndpoint) {
+              toast.info("Your Session has expired. Please sign in again.");
+              const role = error.response?.data?.role || "user";
+              switch (role) {
+                case "user":
+                  window.location.href = "/user/signin";
+                  break;
+                case "admin":
+                  window.location.href = "/admin/signin";
+                  break;
+                default:
+                  window.location.href = "/";
+              }
             }
           }
           return Promise.reject(refreshError);
         }
       }
 
-      if (
-        error.response?.status === 403 &&
-        error.response?.data?.message === "No token provided."
-      ) {
-        console.log("NO TOKEN");
-        toast.info("Your session has expired. Please sign in again.");
-        window.location.href = "/";
-        return Promise.reject(error);
-      }
+
 
       if (
         error.response?.status === 400 &&

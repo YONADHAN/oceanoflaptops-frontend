@@ -53,7 +53,7 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 h-[70px] flex flex-col justify-center ${scrolled
+      className={`fixed w-full z-[999] transition-all duration-300 h-[70px] flex flex-col justify-center ${scrolled
         ? isDarkMode
           ? "bg-gray-900/85 backdrop-blur-lg border-b border-gray-800"
           : "bg-white/85 backdrop-blur-lg border-b border-gray-200 shadow-sm"

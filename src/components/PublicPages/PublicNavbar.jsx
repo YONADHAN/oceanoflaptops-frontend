@@ -16,7 +16,7 @@ function SimpleNavbar() {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
+      className={`fixed w-full z-[999] transition-all duration-300 ${
         scrolled
           ? "bg-blue-700/90 text-white shadow-lg backdrop-blur-lg"
           : "bg-gradient-to-r from-blue-600 to-blue-500 text-white"

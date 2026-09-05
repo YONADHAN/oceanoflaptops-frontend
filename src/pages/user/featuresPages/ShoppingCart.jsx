@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -8,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
 import { motion } from "framer-motion";
+import { savePendingReturnTo } from "../../../utils/navigation/returnTo";
 
 export default function ShoppingCart() {
   const dispatch = useDispatch();
@@ -28,6 +28,7 @@ export default function ShoppingCart() {
   const fetchCartData = async () => {
     try {
       if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate("/user/signin");
         return;
       }
@@ -50,6 +51,7 @@ export default function ShoppingCart() {
   const fetchCartItems = async () => {
     try {
       if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate("/user/signin");
         return;
       }
@@ -171,6 +173,7 @@ export default function ShoppingCart() {
 
   const goToCheckOutPage = async () => {
     if (!isAuthenticated || !user) {
+      savePendingReturnTo(window.location);
       navigate("/user/signin");
       return;
     }

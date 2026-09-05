@@ -1,10 +1,12 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import LoadingSpinner from '../../pages/others/commonReusableComponents/LoadingSpinner';
+import { savePendingReturnTo } from '../navigation/returnTo';
 
 const PrivateRoute = ({ allowedRole, redirectTo, children }) => {
     const { isAuthenticated, isInitialized, role } = useSelector((state) => state.auth);
+    const location = useLocation();
 
     if (!isInitialized) {
         return (
@@ -15,6 +17,7 @@ const PrivateRoute = ({ allowedRole, redirectTo, children }) => {
     }
 
     if (!isAuthenticated) {
+        savePendingReturnTo(location);
         return <Navigate to={redirectTo} replace />;
     }
 

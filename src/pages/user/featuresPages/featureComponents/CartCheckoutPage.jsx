@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import AddAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementAddAddress";
 import EditAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementEditAddress";
 import CouponCard from "../../../../components/UserComponents/coupons/couponCard";
+import { savePendingReturnTo } from "../../../../utils/navigation/returnTo";
 import PaymentFailure from "../../../../pages/others/PaymentFailure";
 const Checkout = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
@@ -50,6 +51,7 @@ const Checkout = () => {
   const fetchCartData = async () => {
     try {
       if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate("/user/signin");
         return;
       }
@@ -683,20 +685,30 @@ const Checkout = () => {
                 { id: "Razor pay", label: "Razorpay" },
                 { id: "wallet", label: "Wallet" },
                 { id: "Cash on Delivery", label: "Cash on Delivery" },
-              ].map((method) => (
+              ].map((method) => {
+                const totalOrderAmount = finalAmount > 0 ? (finalAmount + 15) : (cartData.netTotal + 15);
+                const isCodDisabled = method.id === "Cash on Delivery" && totalOrderAmount > 1000;
+
+                return (
                 <label
                   key={method.id}
-                  className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all duration-200 ${paymentMethod === method.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                    }`}
+                  className={`flex items-start p-4 border rounded-lg transition-all duration-200 ${
+                    isCodDisabled ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200" : "cursor-pointer"
+                  } ${
+                    !isCodDisabled && paymentMethod === method.id
+                      ? "border-blue-500 bg-blue-50"
+                      : !isCodDisabled ? "border-gray-200 hover:border-gray-300" : ""
+                  }`}
                 >
                   <input
                     type="radio"
                     name="payment"
                     value={method.id}
-                    checked={paymentMethod === method.id}
-                    onChange={() => setPaymentMethod(method.id)}
+                    checked={paymentMethod === method.id && !isCodDisabled}
+                    disabled={isCodDisabled}
+                    onChange={() => {
+                      if (!isCodDisabled) setPaymentMethod(method.id);
+                    }}
                     className="mt-1 mr-4"
                   />
                   <div className="flex justify-between w-full">
@@ -714,7 +726,7 @@ const Checkout = () => {
                     </div>
                   </div>
                 </label>
-              ))}
+              )})}
             </div>
           </div>
         </div>

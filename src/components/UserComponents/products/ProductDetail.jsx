@@ -15,6 +15,7 @@ import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
 import { fetchWishlistCountAsync } from "../../../redux/slices/wishlistSlice";
+import { savePendingReturnTo } from "../../../utils/navigation/returnTo";
 
 const ProductDetailPage = ({ productId }) => {
   const dispatch = useDispatch();
@@ -111,6 +112,7 @@ const ProductDetailPage = ({ productId }) => {
   const handleQuantityChange = async (action) => {
     try {
       if (!isAuthenticated) {
+        savePendingReturnTo(window.location);
         navigate('/user/signin');
         return;
       }
@@ -191,6 +193,7 @@ const ProductDetailPage = ({ productId }) => {
   const handleAddToCart = async () => {
     try {
       if (!isAuthenticated) {
+        savePendingReturnTo(window.location);
         navigate('/user/signin');
         return;
       }
@@ -273,6 +276,7 @@ const ProductDetailPage = ({ productId }) => {
 
     try {
       if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate('/user/signin');
         return;
       }
