@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { axiosInstance } from '../../api/axiosConfig';
+import Cookies from 'js-cookie';
+import { authService } from '../../apiServices/authService';
 
 export const fetchAuthSession = createAsyncThunk(
   'auth/fetchAuthSession',
@@ -15,6 +17,27 @@ export const fetchAuthSession = createAsyncThunk(
         return rejectWithValue('unauthenticated');
       }
       return rejectWithValue(error.message || 'Network Error');
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { getState, dispatch }) => {
+    try {
+      const state = getState();
+      const userId = state.auth.user?._id;
+      
+      // Perform server-side logout
+      await authService.logout(userId);
+    } catch (error) {
+      console.error("Backend logout failed:", error);
+      // Swallow error to ensure local cleanup continues
+    } finally {
+      // Backend handles HttpOnly cookie removal.
+      
+      // Reset Redux auth state
+      dispatch(logout());
     }
   }
 );

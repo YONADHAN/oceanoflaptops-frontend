@@ -79,24 +79,11 @@ const AdminSignin = () => {
       if (response?.data?.success) {
         const accessToken = response?.data?.accessToken;
 
-        if (!accessToken) {
-          throw new Error("Access token not provided in response.");
-        }
+        // if (!accessToken) {
+        //   throw new Error("Access token not provided in response.");
+        // }
 
         toast.success("Sign-in successful");
-
-        // Cookies.set('admin_access_token', accessToken, { 
-        //   expires: rememberMe ? 13 : 1,
-        //   secure: false, 
-        //   sameSite: 'Strict', 
-        //   // path: '' 
-        // });
-        Cookies.set('access_token', accessToken, { 
-          expires:  45/1440,
-          secure: false, 
-          sameSite: 'Strict', 
-          // path: '' 
-        });
 
         setTimeout(() => {
           navigate('/admin/dashboard');

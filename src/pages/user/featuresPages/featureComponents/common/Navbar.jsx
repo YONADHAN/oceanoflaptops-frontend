@@ -13,15 +13,12 @@ import {
   LogOut,
   Laptop
 } from "lucide-react";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import { jwtDecode as jwt_decode } from "jwt-decode";
-import { axiosInstance } from "../../../../../api/axiosConfig";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCartCountAsync } from "../../../../../redux/slices/cartSlice";
 import { fetchWishlistCountAsync } from "../../../../../redux/slices/wishlistSlice";
+import { logoutUser } from "../../../../../redux/slices/authSlice";
 
 const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,32 +35,10 @@ const ModernNavbar = ({ isDarkMode, toggleTheme, toggleSidebar }) => {
 
   const handleLogout = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
-        Cookies.remove("RefreshToken");
-        Cookies.remove("access_token");
-        navigate('/user/signin')
-        return;
-      }
-
-      const decoded = jwt_decode(token);
-      if (!decoded || !decoded._id) {
-        toast.error("Invalid token");
-        return;
-      }
-
-      const id = decoded._id;
-      const deleted = await axiosInstance.delete(`/auth/refresh-token/${id}`);
-      if (!deleted || deleted.status !== 200) {
-        toast.error("Unsuccessful logout!");
-        return;
-      }
-
-      Cookies.remove("RefreshToken");
-      Cookies.remove("access_token");
+      await dispatch(logoutUser()).unwrap();
       navigate("/user/signin");
     } catch (error) {
-      window.location.reload();
+      console.error(error);
     }
   };
 

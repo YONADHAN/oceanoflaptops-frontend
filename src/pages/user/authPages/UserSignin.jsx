@@ -64,17 +64,10 @@ const Signin = () => {
       });
       if (response.status === 200) {
         // console.log(response.data);
-        const { accessToken, message } = response.data;
+        // const { accessToken, message } = response.data;
         // console.log("user_access_token is :", accessToken);
         // console.log("Sign-in successful:", message);
         toast.success("Sign-in successful");
-
-        Cookies.set("access_token", accessToken, {
-          expires: 45 / 1440,
-          secure: false,
-          sameSite: "Strict",
-          // path: ''
-        });
 
         navigate("/");
       }

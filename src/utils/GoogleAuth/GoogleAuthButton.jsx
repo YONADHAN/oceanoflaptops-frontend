@@ -15,17 +15,10 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
             });
 
             if (res.status === 200) {
-                const { accessToken, message } = res.data;
+                const { message } = res.data;
 
 
                 toast.success(message);
-
-
-                Cookies.set(`access_token`, accessToken, {
-                    expires: 45 / 1440,
-                    secure: false,
-                    sameSite: "Strict",
-                });
 
                 // Navigate to the user or admin home page based on role
                 if (role === "user") {

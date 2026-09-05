@@ -7,7 +7,6 @@ import React, { useState } from "react";
 import { axiosInstance } from "../../api/axiosConfig";
 import { authService } from "../../apiServices/adminApiServices";
 import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -45,16 +44,7 @@ const EmailVerification = ({ linkFrom = "security", role = "user" }) => {
           toast.success("Verification email sent.");
         }
       } else {
-        const token = Cookies.get("access_token");
-        if (!token) {
-          setErrorMessage("Please log in first.");
-          setLoading(false);
-          return;
-        }
-
-        const decoded = jwtDecode(token);
-        const userId = decoded._id;
-        const data = { userId, email };
+        const data = { email };
 
         const response = await authService.requestPasswordReset(data);
         if (response.data.success) {

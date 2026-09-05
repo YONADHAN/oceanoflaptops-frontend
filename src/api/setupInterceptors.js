@@ -2,6 +2,8 @@ import Cookies from "js-cookie";
 import { axiosInstance } from "./axiosConfig";
 import { toast } from "sonner";
 
+let refreshPromise = null;
+
 const attachRequestInterceptor = (axiosCustomInstance) => {
   axiosCustomInstance.interceptors.request.use(
     (config) => {
@@ -10,16 +12,15 @@ const attachRequestInterceptor = (axiosCustomInstance) => {
         return config;
       }
 
-      const token = Cookies.get("access_token");
-
-     
-      
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      const method = config.method ? config.method.toUpperCase() : "GET";
+      if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+        const csrfToken = Cookies.get("csrf_token");
+        if (csrfToken) {
+          config.headers["X-CSRF-Token"] = csrfToken;
+        }
       }
-     
 
+      // Cookies are handled automatically by the browser with withCredentials: true
       return config;
     },
     (error) => Promise.reject(error)
@@ -55,27 +56,35 @@ const attachResponseInterceptor = async (
         originalRequest._retry = true;
 
         try {
-          const response = await axiosInstance.post(
-            refreshEndpoint,
-            {},
-            { withCredentials: true }
-          );
+          if (!refreshPromise) {
+            refreshPromise = axiosInstance.post(
+              refreshEndpoint,
+              {},
+              { withCredentials: true }
+            ).finally(() => {
+              refreshPromise = null;
+            });
+          }
+          await refreshPromise;
 
-          const { role, access_token } = response.data;
+          // Update CSRF token on retry if it's a mutation request
+          const method = originalRequest.method ? originalRequest.method.toUpperCase() : "GET";
+          if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
+            const csrfToken = Cookies.get("csrf_token");
+            if (csrfToken) {
+              if (!originalRequest.headers) originalRequest.headers = {};
+              originalRequest.headers["X-CSRF-Token"] = csrfToken;
+            }
+          }
 
-          Cookies.set(`access_token`, access_token, {
-            expires: 15 / (24 * 60),
-          });
-
-          console.log(`${role}_access_token stored successfully.`);
-
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          // The backend will automatically set the new access_token cookie
+          // on a successful refresh response.
           return axiosCustomInstance(originalRequest);
         } catch (refreshError) {
           console.error("Refresh Token Error:", refreshError);
 
-          Cookies.remove("RefreshToken");
-          Cookies.remove("access_token");
+          // We cannot remove HttpOnly cookies from JS. 
+          // They will be removed by the backend logout endpoint or expire naturally.
 
           toast.info("Your Session has expired. Please sign in again.");
 

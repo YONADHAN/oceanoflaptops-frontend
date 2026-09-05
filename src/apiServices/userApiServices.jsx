@@ -51,7 +51,7 @@ const cartService = {
   }),
   removeFromCart: (userId, productId) => axiosInstance.post('/remove_from_cart', {userId, productId}),
   checkout: (data) => axiosInstance.post('/checkout', data),
-  clearCart: () => axiosInstance.get('/clear_cart'),
+  clearCart: () => axiosInstance.post('/clear_cart'),
   getCartData: (userId) => axiosInstance.post('/cart_data',{userId}),
   refreshCart: (userId) => axiosInstance.post('/refresh_cart', {userId})
 };

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Bell, User, Sun, Moon, Laptop, LogOut } from 'lucide-react';
-import { jwtDecode as jwt_decode } from "jwt-decode";
-import Cookies from 'js-cookie'
-import {toast} from 'sonner'
-import {axiosInstance} from '../../api/axiosConfig'
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../redux/slices/authSlice';
+
 const Header = ({ role, toggleSidebar, toggleTheme, isAuthenticated, userAvatar }) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -13,47 +12,15 @@ const Header = ({ role, toggleSidebar, toggleTheme, isAuthenticated, userAvatar 
     toggleTheme();
   };
 
-  
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleLogout = async() => {
     try {
-      // const token = Cookies.get("admin_access_token");
-      const token = Cookies.get("access_token");
-      if (!token) {
-        toast.error("Token not found");
-        return;
-      }
-  
-      const decoded = jwt_decode(token);
-   
-      if (!decoded || !decoded._id) {
-        toast.error("Invalid token");
-        return;
-      }
-  
-      const id = decoded._id;
-      const deleted = await axiosInstance.delete(`/auth/refresh-token/${id}`);
-   
-      if (!deleted || deleted.status !== 200) {
-        toast.error("Unsuccessful logout!");
-        return;
-      }
-     
-      document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-      document.cookie = "RefreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-  
-      // // Remove cookies
-      // Cookies.remove("userRefreshToken");
-      // Cookies.remove("user_access_token");
-
-      window.location.href = '/admin/signin';
-      // // Navigate to sign-in page
-      // navigate("/admin/signin");
-      console.log('Logging out...');
+      await dispatch(logoutUser()).unwrap();
+      navigate("/admin/signin");
     } catch (error) {
-      //console.error(error);
-      //toast.error("Error in logout");
       window.location.reload();
-
     }
   };
 

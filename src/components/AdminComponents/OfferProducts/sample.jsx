@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../api/axiosConfig";
-import Cookies from "js-cookie";
 import { toast } from "sonner";
-import {jwtDecode }from "jwt-decode"; 
 
 export default function ShoppingCart() {
   const [products, setProducts] = useState([]);
@@ -20,16 +18,7 @@ export default function ShoppingCart() {
 
   const fetchCartData = async () => {
     try {
-          const token = Cookies.get("access_token");
-          if (!token) {
-            navigate("/login");
-            return;
-          }
-    
-          const decoded = jwtDecode(token);
-          const userId = decoded._id;
-    
-          const response = await axiosInstance.post("/cart_data", { userId });
+      const response = await axiosInstance.post("/cart_data", {});
           if (response.status === 200 && response.data.success) {
             setCartData(response.data.cart); // Use response.data.cart instead of response.data
           } else {
@@ -37,6 +26,9 @@ export default function ShoppingCart() {
             console.error(response.data.message || "Failed to fetch cart");
           }
         } catch (error) {
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            navigate("/login");
+          }
           console.error("Error fetching cart data:", error);
           // toast.error("Failed to fetch cart data");
         }
@@ -44,18 +36,7 @@ export default function ShoppingCart() {
 
   const fetchCartItems = async () => {
      try {
-          // const token = Cookies.get("user_access_token");
-          const token = Cookies.get("access_token");
-          if (!token) {
-            navigate("/login");
-            return;
-          }
-    
-          const decoded = jwtDecode(token);
-          // console.log("decoded", decoded);
-          const userId = decoded._id;
-    
-          const response = await axiosInstance.post("/get_cart_items", { userId });
+          const response = await axiosInstance.post("/get_cart_items", {});
           if (response.data.success) {
             const cartItems = response.data.cartItems.map((item) => ({
               id: item.productId._id,
@@ -81,10 +62,12 @@ export default function ShoppingCart() {
           }
           toast.info(response.data.message);
         } catch (error) {
-          if (error.status === 404) {
+          if (error.response?.status === 401 || error.response?.status === 403) {
+            navigate("/login");
+          } else if (error.status === 404) {
             toast.error("No products has been added to the cart");
           } else {
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Error fetching cart items");
           }
         } finally {
           setLoading(false);
@@ -93,18 +76,12 @@ export default function ShoppingCart() {
 
    const updateQuantity = async (id, change) => {
       try {
-        // const token = Cookies.get("user_access_token");
-        const token = Cookies.get("access_token");
-        const decoded = jwtDecode(token);
-        const userId = decoded._id;
-  
         const product = products.find((p) => p.id === id);
         const newQuantity = product.quantity + change;
   
         // Check if trying to go below 1
         if (newQuantity < 1) {
           await axiosInstance.post("/remove_from_cart", {
-            userId,
             productId: id,
           });
           setProducts(products.filter((product) => product.id !== id));
@@ -157,13 +134,7 @@ export default function ShoppingCart() {
   
     const removeItem = async (id) => {
       try {
-        // const token = Cookies.get("user_access_token");
-        const token = Cookies.get("access_token");
-        const decoded = jwtDecode(token);
-        const userId = decoded._id;
-  
         await axiosInstance.post("/remove_from_cart", {
-          userId,
           productId: id,
         });
   
@@ -175,12 +146,8 @@ export default function ShoppingCart() {
     };
 
   const goToCheckOutPage = async () => {
-    const token = Cookies.get("access_token");
-    const decoded = jwtDecode(token);
-    const userId = decoded._id;
-
     try {
-      const response = await axiosInstance.post("/refresh_cart", { userId });
+      const response = await axiosInstance.post("/refresh_cart", {});
       if (response.data.success) {
         if (response.data.blockedProducts.length > 0) {
           setBlockedProducts(response.data.blockedProducts);
