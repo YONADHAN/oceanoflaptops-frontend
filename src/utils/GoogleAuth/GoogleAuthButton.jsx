@@ -1,4 +1,6 @@
 import { GoogleLogin } from "@react-oauth/google";
+import { useDispatch } from 'react-redux';
+import { fetchAuthSession } from "../../redux/slices/authSlice";
 import { toast } from "sonner";
 import { axiosInstance } from "../../api/axiosConfig";
 import Cookies from "js-cookie";
@@ -6,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
     const navigate = useNavigate(); // For redirection
+    const dispatch = useDispatch();
 
     const handleGoogleSuccess = async (response) => {
         try {
@@ -19,6 +22,8 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
 
 
                 toast.success(message);
+
+                await dispatch(fetchAuthSession()).unwrap();
 
                 // Navigate to the user or admin home page based on role
                 if (role === "user") {

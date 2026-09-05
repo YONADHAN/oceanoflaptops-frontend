@@ -1,4 +1,3 @@
-import Cookies from "js-cookie";
 import { axiosInstance } from "./axiosConfig";
 import { toast } from "sonner";
 
@@ -10,14 +9,6 @@ const attachRequestInterceptor = (axiosCustomInstance) => {
       if (config.url.includes("cloudinary.com")) {
         config.withCredentials = false;
         return config;
-      }
-
-      const method = config.method ? config.method.toUpperCase() : "GET";
-      if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
-        const csrfToken = Cookies.get("csrf_token");
-        if (csrfToken) {
-          config.headers["X-CSRF-Token"] = csrfToken;
-        }
       }
 
       // Cookies are handled automatically by the browser with withCredentials: true
@@ -66,16 +57,6 @@ const attachResponseInterceptor = async (
             });
           }
           await refreshPromise;
-
-          // Update CSRF token on retry if it's a mutation request
-          const method = originalRequest.method ? originalRequest.method.toUpperCase() : "GET";
-          if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
-            const csrfToken = Cookies.get("csrf_token");
-            if (csrfToken) {
-              if (!originalRequest.headers) originalRequest.headers = {};
-              originalRequest.headers["X-CSRF-Token"] = csrfToken;
-            }
-          }
 
           // The backend will automatically set the new access_token cookie
           // on a successful refresh response.

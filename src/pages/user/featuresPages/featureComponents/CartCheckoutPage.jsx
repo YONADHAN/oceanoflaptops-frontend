@@ -6,7 +6,8 @@ import {
   authService,
   checkoutService,
 } from "../../../../apiServices/userApiServices";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setCartCount } from "../../../../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
 import AddAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementAddAddress";
 import EditAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementEditAddress";
@@ -14,6 +15,7 @@ import CouponCard from "../../../../components/UserComponents/coupons/couponCard
 import PaymentFailure from "../../../../pages/others/PaymentFailure";
 const Checkout = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("Razor pay");
@@ -208,7 +210,7 @@ const Checkout = () => {
     } catch (error) {
       console.error("Error applying coupon:", error);
       toast.error(error.response?.data?.message || "Failed to apply coupon");
-      throw error; // Re-throw so `handlePlaceOrder()` can handle it
+      throw error; 
     }
   };
 
@@ -456,6 +458,7 @@ const Checkout = () => {
 
   const clearCart = () => {
     setCart({ items: [], totalAmount: 0 });
+    dispatch(setCartCount(0));
   };
 
   if (addressesLoading) {

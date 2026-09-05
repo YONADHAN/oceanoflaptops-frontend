@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { fetchAuthSession } from "../../../redux/slices/authSlice";
 import { Eye, EyeOff, Laptop } from "lucide-react";
 // import axios from 'axios';
 import { axiosInstance } from "../../../api/axiosConfig";
@@ -16,6 +18,7 @@ const Signin = () => {
 
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -69,6 +72,7 @@ const Signin = () => {
         // console.log("Sign-in successful:", message);
         toast.success("Sign-in successful");
 
+        await dispatch(fetchAuthSession()).unwrap();
         navigate("/");
       }
     } catch (error) {
