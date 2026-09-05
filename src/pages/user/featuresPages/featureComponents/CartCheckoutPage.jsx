@@ -6,14 +6,17 @@ import {
   authService,
   checkoutService,
 } from "../../../../apiServices/userApiServices";
-import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
+import { useSelector, useDispatch } from "react-redux";
+import { setCartCount } from "../../../../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
 import AddAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementAddAddress";
 import EditAddress from "../../../../pages/user/featuresPages/featureComponents/AccountAddressManagementEditAddress";
 import CouponCard from "../../../../components/UserComponents/coupons/couponCard";
+import { savePendingReturnTo } from "../../../../utils/navigation/returnTo";
 import PaymentFailure from "../../../../pages/others/PaymentFailure";
 const Checkout = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("Razor pay");
@@ -47,14 +50,12 @@ const Checkout = () => {
   }, [navigate]);
   const fetchCartData = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate("/user/signin");
         return;
       }
-
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      const userId = user._id;
 
       //const response = await axiosInstance.post("/cart_data", { userId });//--------------------------------
       const response = await cartService.getCartData(userId);
@@ -71,15 +72,11 @@ const Checkout = () => {
 
   const fetchCart = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-
-      const decoded = jwtDecode(token);
-
-      const userId = decoded._id;
+      const userId = user._id;
       const response = await cartService.getCart({ userId });
       if (!response.data.success) {
         toast.error(response.data.message || "Failed to fetch cart");
@@ -105,15 +102,11 @@ const Checkout = () => {
 
   const fetchWalletBalance = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-
-      const decoded = jwtDecode(token);
-
-      const userId = decoded._id;
+      const userId = user._id;
       const wallet = await axiosInstance.post("/wallet_balance", { userId });
       if (wallet.status === 200) {
         setWalletBalance(wallet.data.balance);
@@ -135,14 +128,12 @@ const Checkout = () => {
   const fetchAddresses = async () => {
     setAddressesLoading(true);
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Please login to continue");
         return;
       }
-      const decoded = jwtDecode(token);
       const response = await axiosInstance.get(
-        `/addresses_get?userId=${decoded._id}`
+        `/addresses_get?userId=${user._id}`
       );
       if (response.data.addresses) {
         const sortedAddresses = response.data.addresses.sort((a, b) => {
@@ -173,9 +164,8 @@ const Checkout = () => {
   };
 
   const cartRefresh = async () => {
-    const token = Cookies.get("access_token");
-    const decoded = jwtDecode(token);
-    const userId = decoded._id;
+    if (!isAuthenticated || !user) return;
+    const userId = user._id;
     try {
       const response = await axiosInstance.post("/refresh_cart", { userId });
 
@@ -206,12 +196,10 @@ const Checkout = () => {
 
   const apply_coupon_ultimate = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) throw new Error("No access token found");
+      if (!isAuthenticated || !user) throw new Error("No user found");
 
-      const decoded = jwtDecode(token);
       const response = await axiosInstance.post("/apply_coupon_ultimate", {
-        userId: decoded._id,
+        userId: user._id,
         couponCode: appliedCouponCode,
       });
 
@@ -224,7 +212,7 @@ const Checkout = () => {
     } catch (error) {
       console.error("Error applying coupon:", error);
       toast.error(error.response?.data?.message || "Failed to apply coupon");
-      throw error; // Re-throw so `handlePlaceOrder()` can handle it
+      throw error; 
     }
   };
 
@@ -244,11 +232,10 @@ const Checkout = () => {
         return;
       }
 
-      const token = Cookies.get("access_token");
-      const decoded = jwtDecode(token);
+      if (!isAuthenticated || !user) return;
 
       const orderData = {
-        user: decoded._id,
+        user: user._id,
         orderItems: cart.items.map((item) => ({
           product: item.productId,
           productName: item.productName,
@@ -473,6 +460,7 @@ const Checkout = () => {
 
   const clearCart = () => {
     setCart({ items: [], totalAmount: 0 });
+    dispatch(setCartCount(0));
   };
 
   if (addressesLoading) {
@@ -697,20 +685,30 @@ const Checkout = () => {
                 { id: "Razor pay", label: "Razorpay" },
                 { id: "wallet", label: "Wallet" },
                 { id: "Cash on Delivery", label: "Cash on Delivery" },
-              ].map((method) => (
+              ].map((method) => {
+                const totalOrderAmount = finalAmount > 0 ? (finalAmount + 15) : (cartData.netTotal + 15);
+                const isCodDisabled = method.id === "Cash on Delivery" && totalOrderAmount > 1000;
+
+                return (
                 <label
                   key={method.id}
-                  className={`flex items-start p-4 border rounded-lg cursor-pointer transition-all duration-200 ${paymentMethod === method.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-200 hover:border-gray-300"
-                    }`}
+                  className={`flex items-start p-4 border rounded-lg transition-all duration-200 ${
+                    isCodDisabled ? "opacity-50 cursor-not-allowed bg-gray-50 border-gray-200" : "cursor-pointer"
+                  } ${
+                    !isCodDisabled && paymentMethod === method.id
+                      ? "border-blue-500 bg-blue-50"
+                      : !isCodDisabled ? "border-gray-200 hover:border-gray-300" : ""
+                  }`}
                 >
                   <input
                     type="radio"
                     name="payment"
                     value={method.id}
-                    checked={paymentMethod === method.id}
-                    onChange={() => setPaymentMethod(method.id)}
+                    checked={paymentMethod === method.id && !isCodDisabled}
+                    disabled={isCodDisabled}
+                    onChange={() => {
+                      if (!isCodDisabled) setPaymentMethod(method.id);
+                    }}
                     className="mt-1 mr-4"
                   />
                   <div className="flex justify-between w-full">
@@ -728,7 +726,7 @@ const Checkout = () => {
                     </div>
                   </div>
                 </label>
-              ))}
+              )})}
             </div>
           </div>
         </div>

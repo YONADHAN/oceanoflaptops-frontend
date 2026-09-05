@@ -3,12 +3,12 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { axiosInstance } from '../../../../api/axiosConfig';
 import {authService} from '../../../../apiServices/userApiServices'
 import { toast } from 'sonner';
-import Cookies from 'js-cookie';
+import { useSelector } from 'react-redux';
 import AddressForm from './AccountAddressManagementAddressForm';
 import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const EditAddress = ({ redirectToCheckout = false, onSuccess, addressFromCheckout }) => {
- 
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   let {id }= useParams();
   
@@ -43,11 +43,8 @@ const EditAddress = ({ redirectToCheckout = false, onSuccess, addressFromCheckou
 
   const handleEditAddress = async (updatedAddress) => {
     try {
-      
-      const token = Cookies.get('access_token');
-      if (!token) {
+      if (!isAuthenticated) {
         toast.error('Please login to continue');
-        
         return;
       }
    

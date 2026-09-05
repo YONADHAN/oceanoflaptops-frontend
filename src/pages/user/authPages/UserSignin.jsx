@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
+import { fetchAuthSession } from "../../../redux/slices/authSlice";
 import { Eye, EyeOff, Laptop } from "lucide-react";
 // import axios from 'axios';
 import { axiosInstance } from "../../../api/axiosConfig";
@@ -8,6 +10,7 @@ import { Toaster, toast } from "sonner";
 import GoogleButton from "../../../utils/GoogleAuth/GoogleAuthButton";
 import { authService } from "../../../apiServices/userApiServices";
 import { motion } from "framer-motion";
+import { getPendingReturnTo, clearPendingReturnTo } from "../../../utils/navigation/returnTo";
 
 const Signin = () => {
   const [email, setEmail] = useState("");
@@ -16,6 +19,7 @@ const Signin = () => {
 
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -63,20 +67,16 @@ const Signin = () => {
         password,
       });
       if (response.status === 200) {
-        // console.log(response.data);
-        const { accessToken, message } = response.data;
-        // console.log("user_access_token is :", accessToken);
-        // console.log("Sign-in successful:", message);
         toast.success("Sign-in successful");
 
-        Cookies.set("access_token", accessToken, {
-          expires: 45 / 1440,
-          secure: false,
-          sameSite: "Strict",
-          // path: ''
-        });
-
-        navigate("/");
+        await dispatch(fetchAuthSession()).unwrap();
+        const pendingReturnTo = getPendingReturnTo();
+        if (pendingReturnTo) {
+          navigate(pendingReturnTo);
+          clearPendingReturnTo();
+        } else {
+          navigate("/");
+        }
       }
     } catch (error) {
       if (error.response) {

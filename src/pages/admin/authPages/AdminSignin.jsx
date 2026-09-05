@@ -1,15 +1,15 @@
-
-
-
-
 import React, { useState } from 'react';
-import { Lock, Mail, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { axiosInstance } from '../../../api/axiosConfig'; 
 import {authService} from '../../../apiServices/adminApiServices'
 // Update the path as necessary
 import Cookies from 'js-cookie';
 import { Toaster, toast } from 'sonner';
+import { motion } from 'framer-motion';
+
+import { useDispatch } from 'react-redux';
+import { fetchAuthSession } from '../../../redux/slices/authSlice';
 
 const AdminSignin = () => {
   const [email, setEmail] = useState('');
@@ -18,8 +18,7 @@ const AdminSignin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const isDarkMode = false;
-
+  const dispatch = useDispatch();
 
   const validation = (email, password) => {
     if (email.trim().length === 0 && password.trim().length === 0) {
@@ -50,7 +49,6 @@ const AdminSignin = () => {
     return true;
 };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -69,34 +67,9 @@ const AdminSignin = () => {
 
       const response = await authService.adminSignIn(data);
 
-      // const response = await axiosInstance.post('/admin/admin_signin', { 
-      //   email:email.toLowerCase().trim(), 
-      //   password,
-      //   remember: rememberMe,
-      // });
-      
-
       if (response?.data?.success) {
-        const accessToken = response?.data?.accessToken;
-
-        if (!accessToken) {
-          throw new Error("Access token not provided in response.");
-        }
-
         toast.success("Sign-in successful");
-
-        // Cookies.set('admin_access_token', accessToken, { 
-        //   expires: rememberMe ? 13 : 1,
-        //   secure: false, 
-        //   sameSite: 'Strict', 
-        //   // path: '' 
-        // });
-        Cookies.set('access_token', accessToken, { 
-          expires:  45/1440,
-          secure: false, 
-          sameSite: 'Strict', 
-          // path: '' 
-        });
+        await dispatch(fetchAuthSession()).unwrap();
 
         setTimeout(() => {
           navigate('/admin/dashboard');
@@ -108,7 +81,6 @@ const AdminSignin = () => {
       console.error("Sign-in error:", error);
       const errorMessage = 
         error?.response?.data?.message || 
-        // error.message || 
         "An error occurred during sign-in.";
       toast.error(errorMessage);
     } finally {
@@ -117,74 +89,95 @@ const AdminSignin = () => {
   };
 
   return (
-    <div className={`min-h-screen flex justify-center ${isDarkMode ? "dark bg-gray-900" : "bg-gradient-to-b from-blue-100 to-blue-200"}`}>
-      {/* <Toaster richColors position="top-right" /> */}
-      <div className="container mx-auto flex items-center justify-center px-16">
-        <div className={`max-w-md mx-auto rounded-lg shadow-lg overflow-hidden ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
-          <div className="p-8">
-            <h2 className={`text-3xl text-center font-bold mb-6 ${isDarkMode ? "text-white" : "text-gray-800"}`}>Welcome Back!</h2>
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-              <div>
-                <label htmlFor="email" className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Email Address</label>
-                <div className="relative">
-                  <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
+    <div className="min-h-screen flex items-center justify-center bg-[#0f172a] relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-600/20 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/20 blur-[120px] pointer-events-none" />
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-md z-10 px-6"
+      >
+        <div className="bg-slate-900/60 backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl overflow-hidden">
+          <div className="p-8 sm:p-10">
+            <div className="flex flex-col items-center justify-center mb-8">
+              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-4 border border-blue-500/20 shadow-inner">
+                <ShieldCheck className="w-8 h-8 text-blue-400" />
+              </div>
+              <h2 className="text-2xl font-bold text-white tracking-tight">Admin Portal</h2>
+              <p className="text-slate-400 text-sm mt-2 text-center">Enter your credentials to access the dashboard</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-slate-300">Email Address</label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                  </div>
                   <input
                     id="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="admin@oceanoflaptops.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className={`w-full pl-10 pr-3 py-2 border rounded ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-700"} focus:outline-none`}
-                    //required
+                    className="w-full pl-11 pr-4 py-3.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                   />
                 </div>
               </div>
-              <div>
-                <label htmlFor="password" className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Password</label>
-                <div className="relative">
-                  <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="block text-sm font-medium text-slate-300">Password</label>
+                  <a href="/admin/verify_email" className="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors">Forgot password?</a>
+                </div>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
+                  </div>
                   <input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full pl-10 pr-3 py-2 border rounded ${isDarkMode ? "bg-gray-700 text-white" : "bg-gray-100 text-gray-700"} focus:outline-none`}
-                    //required
+                    className="w-full pl-11 pr-12 py-3.5 bg-slate-800/50 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center"
                   >
-                    {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
+                    {showPassword ? 
+                      <EyeOff className="h-5 w-5 text-slate-400 hover:text-slate-200 transition-colors" /> : 
+                      <Eye className="h-5 w-5 text-slate-400 hover:text-slate-200 transition-colors" />
+                    }
                   </button>
                 </div>
               </div>
-              <div className="flex items-center justify-center">
-                <div className="flex items-center">
-                  {/* <input
-                    type="checkbox"
-                    id="remember-me"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="mr-2"
-                  /> */}
-                  {/* <label htmlFor="remember-me" className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`}>Remember me</label> */}
-                </div>
-                <a href="/admin/verify_email" className="text-sm text-blue-500 hover:text-blue-800">Forgot your password?</a>
-              </div>
-              <button
+
+              <motion.button
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
                 type="submit"
-                className={`w-full py-2 rounded ${isDarkMode ? "bg-blue-600 text-white" : "bg-blue-500 text-white"} hover:bg-blue-700`}
                 disabled={isLoading}
+                className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-semibold shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2 transition-all mt-4"
               >
-                {isLoading ? 'Loading...' : 'Log In'}
-              </button>
+                {isLoading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <>
+                    Sign In to Dashboard
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </motion.button>
             </form>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

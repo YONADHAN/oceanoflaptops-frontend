@@ -193,17 +193,10 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    const token = Cookies.get("access_token");
-    const decode = jwtDecode(token);
-    const userId = decode._id;
-    if (!userId) {
-      toast.error("Token not found.");
-      return;
-    }
+    // Token is now HttpOnly, so the backend extracts the userId from the cookie directly.
 
     try {
       const response = await axiosInstance.post("/password-change", {
-        userId,
         oldPassword: currentPassword,
         newPassword,
       });

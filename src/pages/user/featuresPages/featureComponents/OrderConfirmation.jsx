@@ -20,7 +20,7 @@
 //   }
 
 //   const clearCart = () => {
-//     const clear = axiosInstance.get("clear_cart")
+//     const clear = axiosInstance.post("clear_cart")
 //     if (clear.status === "200") {
 //       console.log("Cart cleared successfully")
 //     } else {
@@ -122,7 +122,7 @@ const OrderConfirmation = () => {
   }
 
   const clearCart = () => {
-    const clear = axiosInstance.get("clear_cart")
+    const clear = axiosInstance.post("clear_cart")
     if (clear.status === "200") {
       //console.log("Cart cleared successfully")
     } else {

@@ -1,6 +1,7 @@
-import Cookies from "js-cookie";
 import { axiosInstance } from "./axiosConfig";
 import { toast } from "sonner";
+
+let refreshPromise = null;
 
 const attachRequestInterceptor = (axiosCustomInstance) => {
   axiosCustomInstance.interceptors.request.use(
@@ -10,16 +11,7 @@ const attachRequestInterceptor = (axiosCustomInstance) => {
         return config;
       }
 
-      const token = Cookies.get("access_token");
-
-     
-      
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-     
-
+      // Cookies are handled automatically by the browser with withCredentials: true
       return config;
     },
     (error) => Promise.reject(error)
@@ -37,61 +29,65 @@ const attachResponseInterceptor = async (
       const originalRequest = error.config;
 
       if (
-        error.response?.status === 401 &&
-        error.response?.data?.message === "Token is invalid or expired." &&
+        originalRequest &&
+        (originalRequest.url.includes("/auth/user/me") || originalRequest.url.includes("/auth/admin/me")) &&
+        !(
+          (error.response?.status === 401 && error.response?.data?.message === "Token is invalid or expired.") ||
+          (error.response?.status === 403 && error.response?.data?.message === "No token provided.")
+        )
+      ) {
+        return Promise.reject(error);
+      }
+
+      if (
+        (
+          (error.response?.status === 401 && error.response?.data?.message === "Token is invalid or expired.") ||
+          (error.response?.status === 403 && error.response?.data?.message === "No token provided.")
+        ) &&
         !originalRequest._retry
       ) {
         originalRequest._retry = true;
 
         try {
-          const response = await axiosInstance.post(
-            refreshEndpoint,
-            {},
-            { withCredentials: true }
-          );
+          if (!refreshPromise) {
+            refreshPromise = axiosInstance.post(
+              refreshEndpoint,
+              {},
+              { withCredentials: true }
+            ).finally(() => {
+              refreshPromise = null;
+            });
+          }
+          await refreshPromise;
 
-          const { role, access_token } = response.data;
-
-          Cookies.set(`access_token`, access_token, {
-            expires: 15 / (24 * 60),
-          });
-
-          console.log(`${role}_access_token stored successfully.`);
-
-          originalRequest.headers.Authorization = `Bearer ${access_token}`;
+          // The backend will automatically set the new access_token cookie
+          // on a successful refresh response.
           return axiosCustomInstance(originalRequest);
         } catch (refreshError) {
           console.error("Refresh Token Error:", refreshError);
-
-          Cookies.remove("RefreshToken");
-          Cookies.remove("access_token");
-
-          toast.info("Your Session has expired. Please sign in again.");
-
-          const role = error.response?.data?.role || "user";
-          switch (role) {
-            case "user":
-              window.location.href = "/user/signin";
-              break;
-            case "admin":
-              window.location.href = "/admin/signin";
-              break;
-            default:
-              window.location.href = "/";
+          if (refreshError.response && (refreshError.response.status === 401 || refreshError.response.status === 403)) {
+            const isBootstrapEndpoint = originalRequest && (originalRequest.url.includes("/auth/user/me") || originalRequest.url.includes("/auth/admin/me"));
+            
+            if (!isBootstrapEndpoint) {
+              toast.info("Your Session has expired. Please sign in again.");
+              const role = error.response?.data?.role || "user";
+              switch (role) {
+                case "user":
+                  window.location.href = "/user/signin";
+                  break;
+                case "admin":
+                  window.location.href = "/admin/signin";
+                  break;
+                default:
+                  window.location.href = "/";
+              }
+            }
           }
           return Promise.reject(refreshError);
         }
       }
 
-      if (
-        error.response?.status === 403 &&
-        error.response?.data?.message === "No token provided."
-      ) {
-        console.log("NO TOKEN");
-        toast.info("Your session has expired. Please sign in again.");
-        window.location.href = "/";
-        return Promise.reject(error);
-      }
+
 
       if (
         error.response?.status === 400 &&

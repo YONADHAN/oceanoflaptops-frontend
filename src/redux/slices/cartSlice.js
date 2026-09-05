@@ -1,19 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { cartService } from '../../apiServices/userApiServices';
-import Cookies from 'js-cookie';
-import { jwtDecode as jwt_decode } from 'jwt-decode';
 
 export const fetchCartCountAsync = createAsyncThunk(
   'cart/fetchCartCount',
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const token = Cookies.get("access_token") || Cookies.get("user_access_token");
-      if (!token) return { count: 0 };
+      const state = getState();
+      const user = state.auth.user;
+      
+      if (!user || !user._id) return { count: 0 };
 
-      const decoded = jwt_decode(token);
-      if (!decoded || !decoded._id) return { count: 0 };
-
-      const response = await cartService.getCartItems(decoded._id);
+      const response = await cartService.getCartItems(user._id);
       if (response.data.success && response.data.cartItems) {
         return { count: response.data.cartItems.length };
       }

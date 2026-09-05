@@ -6,12 +6,13 @@ import ConfirmationAlert from "../../../components/MainComponents/ConformationAl
 import { Wallet, ArrowDownLeft, ArrowUpRight, Clock, Plus, ArrowRightLeft, CreditCard } from "lucide-react"
 import { axiosInstance } from "../../../api/axiosConfig"
 import Cookies from "js-cookie"
-import { jwtDecode } from "jwt-decode"
 import { toast } from "sonner"
+import { useSelector } from "react-redux"
 import { motion, AnimatePresence } from "framer-motion"
 import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs'
 
 const WalletComponent = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
   const [walletData, setWalletData] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [userId, setUserId] = useState(null)
@@ -25,14 +26,12 @@ const WalletComponent = () => {
   const fetchWalletData = useCallback(async (page) => {
     setIsLoading(true)
     try {
-      const token = Cookies.get("access_token")
-      if (!token) {
+      if (!isAuthenticated || !user) {
         toast.error("Authentication token not found, please try to login again.")
         return
       }
 
-      const decoded = jwtDecode(token)
-      const currentUserId = decoded._id
+      const currentUserId = user._id
       setUserId(currentUserId)
 
       const response = await axiosInstance.post("/get_wallet_history", {
@@ -94,10 +93,14 @@ const WalletComponent = () => {
     let subtitle = "";
 
     const refundMatch = title.match(/Refund for(?: cancelled product\(s\):| cancelled product:|) (.*)/i);
+    const withdrawnMatch = title.match(/Withdrawn for: (.*)/i);
 
     if (refundMatch) {
       title = "Refund Received";
       subtitle = refundMatch[1];
+    } else if (withdrawnMatch) {
+      title = "Withdrawn from wallet";
+      subtitle = withdrawnMatch[1];
     } else if (title.toLowerCase().includes("added money") || title.toLowerCase().includes("money added")) {
       title = "Wallet Top-up";
     }
@@ -125,23 +128,23 @@ const WalletComponent = () => {
       </div>
 
       {/* Wallet Balance Card - Premium Gradient */}
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-blue-950 via-blue-900 to-blue-900 shadow-2xl p-8 md:p-12 text-white">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-950 via-blue-900 to-blue-900 shadow-xl p-6 md:p-8 text-white mb-6">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute -bottom-8 -left-8 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute -bottom-8 -left-8 w-56 h-56 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
 
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2 text-blue-200/80 mb-2">
-              <Wallet className="w-5 h-5" />
+        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-blue-200/80 mb-1">
+              <Wallet className="w-4 h-4" />
               <span className="font-semibold tracking-wider text-sm uppercase">Total Balance</span>
             </div>
             <div className="flex items-baseline gap-2">
-              <h2 className="text-5xl md:text-6xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
+              <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
                 ₹{walletData?.balance?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
               </h2>
             </div>
-            <p className="text-blue-200/60 text-sm mt-2 flex items-center gap-1">
+            <p className="text-blue-200/60 text-sm mt-1 flex items-center gap-1.5">
               <CreditCard size={14} /> Available for immediate use
             </p>
           </div>
@@ -170,12 +173,12 @@ const WalletComponent = () => {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && transactions.length === 0 ? (
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
           </div>
         ) : transactions.length > 0 ? (
-          <div className="flex flex-col">
+          <div className={`flex flex-col transition-opacity duration-300 ${isLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             <AnimatePresence>
               {rows.map((row, index) => {
                 const isCredit = row.type.toLowerCase() === 'credit';

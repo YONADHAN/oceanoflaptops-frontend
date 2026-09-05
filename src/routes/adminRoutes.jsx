@@ -1,4 +1,4 @@
-import {Routes, Route} from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import AdminSignin from '../pages/admin/authPages/AdminSignin';
 import PublicRoute from '../utils/ProtectRoutes/PublicRoute';
 import PrivateRoute from '../utils/ProtectRoutes/PrivateRoute';
@@ -53,6 +53,7 @@ const AdminRoutes = () => {
                     }                
                 />
                 <Route path='/' element={<PrivateRoute allowedRole="admin" redirectTo="/admin/signin"><AdminLayout/></PrivateRoute>}>
+                    <Route index element={<Navigate to="dashboard" replace />} />
                     <Route path="dashboard" element={<AdminDashboard />}/>
                     <Route path='sales_report' element={<AdminSalesReport/>}/>
                     <Route path="category" element={<AdminCategory />} />

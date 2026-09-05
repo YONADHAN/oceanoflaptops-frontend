@@ -1,18 +1,17 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { cartService } from "../../../apiServices/userApiServices"
-import Cookies from "js-cookie";
 import { toast } from "sonner";
-import { jwtDecode } from "jwt-decode";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Breadcrumbs from '../../others/commonReusableComponents/breadCrumbs';
 import { fetchCartCountAsync } from "../../../redux/slices/cartSlice";
 import { motion } from "framer-motion";
+import { savePendingReturnTo } from "../../../utils/navigation/returnTo";
 
 export default function ShoppingCart() {
   const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [products, setProducts] = useState([]);
   const [couponCode, setCouponCode] = useState("");
   const [cartData, setCartData] = useState({});
@@ -28,14 +27,12 @@ export default function ShoppingCart() {
 
   const fetchCartData = async () => {
     try {
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate("/user/signin");
         return;
       }
-
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      const userId = user._id;
 
      
       const response = await cartService.getCartData(userId);
@@ -53,15 +50,12 @@ export default function ShoppingCart() {
 
   const fetchCartItems = async () => {
     try {
-    
-      const token = Cookies.get("access_token");
-      if (!token) {
+      if (!isAuthenticated || !user) {
+        savePendingReturnTo(window.location);
         navigate("/user/signin");
         return;
       }
-
-      const decoded = jwtDecode(token);
-      const userId = decoded._id; 
+      const userId = user._id; 
       const response = await cartService.getCartItems(userId);
 
       if (response.data.success) {
@@ -101,9 +95,8 @@ export default function ShoppingCart() {
 
   const updateQuantity = async (id, change) => {
     try {  
-      const token = Cookies.get("access_token");
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;
+      if (!isAuthenticated || !user) return;
+      const userId = user._id;
 
       const product = products.find((p) => p.id === id);
       const newQuantity = product.quantity + change;
@@ -165,10 +158,8 @@ export default function ShoppingCart() {
 
   const removeItem = async (id) => {
     try {
-   
-      const token = Cookies.get("access_token");
-      const decoded = jwtDecode(token);
-      const userId = decoded._id;     
+      if (!isAuthenticated || !user) return;
+      const userId = user._id;     
       const productId = id;
       await cartService.removeFromCart(userId, productId);
       setProducts(products.filter((product) => product.id !== id));
@@ -181,9 +172,12 @@ export default function ShoppingCart() {
   };
 
   const goToCheckOutPage = async () => {
-    const token = Cookies.get("access_token");
-    const decoded = jwtDecode(token);
-    const userId = decoded._id;
+    if (!isAuthenticated || !user) {
+      savePendingReturnTo(window.location);
+      navigate("/user/signin");
+      return;
+    }
+    const userId = user._id;
 
     try {     
       const response = await cartService.refreshCart(userId);

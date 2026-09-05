@@ -86,8 +86,6 @@ const ResetPassword = ({linkFrom = "security",role = "user"}) => {
       if (response.data.success) {
         setSuccessMessage("Password reset successfully. Redirecting to login...");
         toast.success("Password reset successfully")
-        Cookies.remove("access_token");
-        Cookies.remove("RefreshToken");
         setTimeout(() => navigate("/user/signin"), 3000);
       }
     } catch (error) {

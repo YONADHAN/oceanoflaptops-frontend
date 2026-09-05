@@ -4,8 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { axiosInstance } from "../../../../api/axiosConfig";
 import { authService } from "../../../../apiServices/userApiServices";
-import { jwtDecode } from "jwt-decode";
-import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -13,6 +12,7 @@ import { motion } from "framer-motion";
 import Breadcrumbs from '../../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const PersonalInformationPage = () => {
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     name: "",
@@ -149,10 +149,8 @@ const PersonalInformationPage = () => {
 
   const initialUserData = async () => {
     try {
-      // const token = Cookies.get('user_access_token');
-      const token = Cookies.get("access_token");
-      const decode = jwtDecode(token);
-      const userId = decode._id;
+      if (!isAuthenticated || !user) return;
+      const userId = user._id;
       // const response = await axiosInstance.post("/user_details", { userId });
       const response = await authService.getUserDetails(userId);
 
@@ -293,9 +291,8 @@ const PersonalInformationPage = () => {
         }
     
         setIsLoading(true);
-        const token = Cookies.get("access_token");
-        const decode = jwtDecode(token);
-        const userId = decode._id;
+        if (!isAuthenticated || !user) return;
+        const userId = user._id;
     
         const updateData = {
           userId,

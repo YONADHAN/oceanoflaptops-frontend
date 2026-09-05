@@ -1,19 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { wishlistService } from '../../apiServices/userApiServices';
-import Cookies from 'js-cookie';
-import { jwtDecode as jwt_decode } from 'jwt-decode';
 
 export const fetchWishlistCountAsync = createAsyncThunk(
   'wishlist/fetchWishlistCount',
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const token = Cookies.get("access_token") || Cookies.get("user_access_token");
-      if (!token) return { count: 0 };
+      const state = getState();
+      const user = state.auth.user;
       
-      const decoded = jwt_decode(token);
-      if (!decoded || !decoded._id) return { count: 0 };
+      if (!user || !user._id) return { count: 0 };
       
-      const response = await wishlistService.getWishlists({ userId: decoded._id, page: 1, limit: 1000 });
+      const response = await wishlistService.getWishlists({ userId: user._id, page: 1, limit: 1000 });
       if (response.data && response.data.totalProducts !== undefined) {
         return { count: response.data.totalProducts };
       }

@@ -1,11 +1,15 @@
 import { GoogleLogin } from "@react-oauth/google";
+import { useDispatch } from 'react-redux';
+import { fetchAuthSession } from "../../redux/slices/authSlice";
 import { toast } from "sonner";
 import { axiosInstance } from "../../api/axiosConfig";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import { getPendingReturnTo, clearPendingReturnTo } from "../navigation/returnTo";
 
 const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
     const navigate = useNavigate(); // For redirection
+    const dispatch = useDispatch();
 
     const handleGoogleSuccess = async (response) => {
         try {
@@ -15,21 +19,22 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
             });
 
             if (res.status === 200) {
-                const { accessToken, message } = res.data;
+                const { message } = res.data;
 
 
                 toast.success(message);
 
-
-                Cookies.set(`access_token`, accessToken, {
-                    expires: 45 / 1440,
-                    secure: false,
-                    sameSite: "Strict",
-                });
+                await dispatch(fetchAuthSession()).unwrap();
 
                 // Navigate to the user or admin home page based on role
                 if (role === "user") {
-                    navigate("/");
+                    const pendingReturnTo = getPendingReturnTo();
+                    if (pendingReturnTo) {
+                        navigate(pendingReturnTo);
+                        clearPendingReturnTo();
+                    } else {
+                        navigate("/");
+                    }
                 } else if (role === "admin") {
                     navigate("/admin/dashboard");
                 }

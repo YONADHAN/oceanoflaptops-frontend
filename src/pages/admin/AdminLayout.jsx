@@ -4,10 +4,9 @@ import { Home, Users, Settings, Tag, User, ShoppingCart,PackageSearch, Image, Gi
 import Header from '../../components/MainComponents/Header';
 import Sidebar from '../../components/MainComponents/Sidebar';
 import Footer from '../../components/MainComponents/Footer';
-import { jwtDecode as jwt_decode } from "jwt-decode";
-import Cookies from 'js-cookie'
-import {toast} from 'sonner'
-import {axiosInstance} from '../../api/axiosConfig'
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../redux/slices/authSlice';
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);  
@@ -19,50 +18,15 @@ const AdminLayout = () => {
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleLogout = async() => {
     try {
-     
-      const token = Cookies.get("access_token");
-      if (!token) {
-        //toast.error("Token not found");
-        Cookies.remove("RefreshToken");
-        Cookies.remove("access_token");
-        navigate('/admin/signin')
-        return;
-      }
-  
-      const decoded = jwt_decode(token);
-   
-      if (!decoded || !decoded._id) {
-        toast.error("Invalid token");
-        Cookies.remove("RefreshToken");
-        Cookies.remove("access_token");
-        return;
-      }
-  
-      const id = decoded._id;
- 
-      const deleted = await axiosInstance.delete(`/auth/refresh-token/${id}`);
-   
-      if (!deleted || deleted.status !== 200) {
-        toast.error("Unsuccessful logout!");
-        return;
-      }
-     
-      document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-      document.cookie = "RefreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
-  
-     
-
-      window.location.href = '/admin/signin';
-      // // Navigate to sign-in page
-       navigate("/admin/signin");
-      console.log('Logging out...');
+      await dispatch(logoutUser()).unwrap();
+      navigate('/admin/signin');
     } catch (error) {
-      //console.error(error);
-      //toast.error("Error in logout");
       window.location.reload();
-
     }
   };
 

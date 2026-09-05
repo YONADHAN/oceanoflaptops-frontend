@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Tag, X } from 'lucide-react';
 import { axiosInstance } from '../../../api/axiosConfig';
 import { toast } from 'sonner';
-import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode';
+import { useSelector } from 'react-redux';
 
 const CouponCard = ({ totalAmount = 0, onApplyCoupon, onClearCoupon }) => {
   const [showModal, setShowModal] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [availableCoupons, setAvailableCoupons] = useState([]);
-  const [userId, setUserId] = useState('');
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [couponApplied, setCouponApplied] = useState(false);
 
   useEffect(() => {
@@ -18,15 +17,6 @@ const CouponCard = ({ totalAmount = 0, onApplyCoupon, onClearCoupon }) => {
     }
   }, [totalAmount]);
 
-  useEffect(() => {
-    const token = Cookies.get('access_token');
-    if (!token) {
-      //toast.error('Token not found');
-      return;
-    }
-    const decoded = jwtDecode(token);
-    setUserId(decoded._id);
-  }, []);
 
   const fetchAvailableCoupons = async (amount) => {
     try {
@@ -61,6 +51,7 @@ const CouponCard = ({ totalAmount = 0, onApplyCoupon, onClearCoupon }) => {
     } else {
       // Apply coupon logic
       try {
+        const userId = user ? user._id : '';
         const response = await axiosInstance.post('/apply_coupon', {
           couponCode,
           amount: totalAmount,

@@ -3,14 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { Menu, Search, User, Heart, ShoppingCart, X } from "lucide-react";
 import { Sun, Moon, LogOut } from "lucide-react";
-import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { axiosInstance } from "../../api/axiosConfig";
-import { toast } from "sonner";
-import { jwtDecode as jwt_decode } from "jwt-decode";
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchCartCountAsync } from "../../redux/slices/cartSlice";
 import { fetchWishlistCountAsync } from "../../redux/slices/wishlistSlice";
+import { logoutUser } from "../../redux/slices/authSlice";
 function ModernNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -23,36 +20,10 @@ function ModernNavbar() {
   };
   const logoutlogic = async () => {
     try {
-      const token = Cookies.get("user_access_token");
-      if (!token) {
-        toast.error("Token not found");
-        return;
-      }
-
-      const decoded = jwt_decode(token);
-
-      if (!decoded || !decoded._id) {
-        toast.error("Invalid token");
-        return;
-      }
-
-      const id = decoded._id;
-      const deleted = await axiosInstance.delete(`/auth/refresh-token/${id}`);
-
-      if (!deleted || deleted.status !== 200) {
-        toast.error("Unsuccessful logout!");
-        return;
-      }
-
-      // Remove cookies
-      Cookies.remove("userRefreshToken");
-      Cookies.remove("user_access_token");
-
-      // Navigate to sign-in page
+      await dispatch(logoutUser()).unwrap();
       navigate("/user/signin");
     } catch (error) {
       console.error(error);
-      toast.error("Error in logout");
     }
   };
 
@@ -76,7 +47,7 @@ function ModernNavbar() {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 mb-8 ${
+      className={`fixed w-full z-[999] transition-all duration-300 mb-8 ${
         scrolled
           ? isDarkMode
             ? "bg-slate-800/90 text-white shadow-lg backdrop-blur-lg"
