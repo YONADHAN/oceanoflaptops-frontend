@@ -28,13 +28,10 @@ const attachResponseInterceptor = async (
       //console.error("Interceptor Error:", error);
       const originalRequest = error.config;
 
-      // Phase 3 exception: Let auth bootstrap endpoints fail naturally
-      // so Redux fetchAuthSession can handle the expected unauthenticated state
-      // without triggering infinite loops, toasts, or forced redirects.
       if (
         originalRequest &&
         (originalRequest.url.includes("/auth/user/me") || originalRequest.url.includes("/auth/admin/me")) &&
-        (error.response?.status === 401 || error.response?.status === 403)
+        !(error.response?.status === 401 && error.response?.data?.message === "Token is invalid or expired.")
       ) {
         return Promise.reject(error);
       }
@@ -63,22 +60,19 @@ const attachResponseInterceptor = async (
           return axiosCustomInstance(originalRequest);
         } catch (refreshError) {
           console.error("Refresh Token Error:", refreshError);
-
-          // We cannot remove HttpOnly cookies from JS. 
-          // They will be removed by the backend logout endpoint or expire naturally.
-
-          toast.info("Your Session has expired. Please sign in again.");
-
-          const role = error.response?.data?.role || "user";
-          switch (role) {
-            case "user":
-              window.location.href = "/user/signin";
-              break;
-            case "admin":
-              window.location.href = "/admin/signin";
-              break;
-            default:
-              window.location.href = "/";
+          if (refreshError.response && (refreshError.response.status === 401 || refreshError.response.status === 403)) {
+            toast.info("Your Session has expired. Please sign in again.");
+            const role = error.response?.data?.role || "user";
+            switch (role) {
+              case "user":
+                window.location.href = "/user/signin";
+                break;
+              case "admin":
+                window.location.href = "/admin/signin";
+                break;
+              default:
+                window.location.href = "/";
+            }
           }
           return Promise.reject(refreshError);
         }

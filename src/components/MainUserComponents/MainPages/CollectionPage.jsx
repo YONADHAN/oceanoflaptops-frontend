@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import ProductCollection from '../../UserComponents/products/ProductCollection';
 import { motion } from 'framer-motion';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle} from 'lucide-react';
 import Breadcrumbs from '../../../pages/others/commonReusableComponents/breadCrumbs';
 
 const CategoryProducts = () => {
