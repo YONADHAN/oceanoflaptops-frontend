@@ -37,7 +37,8 @@ const Checkout = () => {
   const [finalAmount, setFinalAmount] = useState(0);
   const [walletBalance, setWalletBalance] = useState(0);
   const [paymentFailureModal, setPaymentFailureModal] = useState(false);
-  const [orderDetails, setOrderDetails] = useState({})
+  const [orderDetails, setOrderDetails] = useState({ orderId: null, mongodbId: null });
+  const [idempotencyKey] = useState(() => window.crypto?.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).substring(2, 15));
 
   const toggleModal = () => setPaymentFailureModal(!paymentFailureModal);
 
@@ -279,30 +280,41 @@ const Checkout = () => {
         }
       }
 
+      // Backend-authoritative checkout (Phase 4)
+      const checkoutRes = await axiosInstance.post("/checkout_v2", {
+        shippingAddress: orderData.shippingAddress,
+        paymentMethod: paymentMethod,
+        appliedCouponCode: appliedCouponCode,
+      }, {
+        headers: {
+          'Idempotency-Key': idempotencyKey
+        }
+      });
+
+      if (!checkoutRes.data.success) {
+        toast.error("Checkout failed");
+        return;
+      }
+
+      const { razorpayOrderId, orderId: backendOrderId, mongodbId, amount } = checkoutRes.data;
+
       if (paymentMethod === "Razor pay") {
         try {
-          const { data: razorpayOrder } = await axiosInstance.post(
-            "/create_razorpay_order",
-            {
-              amount: orderData.totalAmount + 15,
-            }
-          );
-
           const options = {
             key: "rzp_test_2aUGLgE6VrGTVa",
-            amount: razorpayOrder.amount,
-            currency: razorpayOrder.currency,
+            amount: Math.round(amount * 100),
+            currency: "INR",
             name: "Ocean of Laptop",
             description: "Payment for order",
-            order_id: razorpayOrder.id,
+            order_id: razorpayOrderId,
             retry: {
               enabled: false,
             },
             handler: async function (response) {
               try {
-
+                // Call unified reconciliation endpoint
                 const verifyRes = await axiosInstance.post(
-                  "/verify_razorpay_payment",
+                  "/reconcile_payment",
                   {
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_payment_id: response.razorpay_payment_id,
@@ -311,15 +323,9 @@ const Checkout = () => {
                 );
 
                 if (verifyRes.data.success) {
-                  orderData.razorpayPaymentId = response.razorpay_payment_id;
-                  orderData.paymentStatus = "Completed";
-                  const finalOrder = await checkoutService.checkout(orderData);
-                  if (finalOrder.status === 200) {
-                    toast.success("Order placed successfully");
-                    apply_coupon_ultimate();
-                    navigate(`confirmation/${finalOrder.data.orderId}`);
-                    clearCart();
-                  }
+                  toast.success("Order placed successfully");
+                  // Fulfillment is handled safely by the backend reconciliation service!
+                  navigate(`confirmation/${verifyRes.data.orderId}`);
                 } else {
                   console.log("Payment verification failed")
                   setPaymentFailureModal(true);
@@ -344,41 +350,19 @@ const Checkout = () => {
 
           const rzp = new window.Razorpay(options);
           rzp.on("payment.failed", async function (response) {
-            orderData.razorpayPaymentId = response.razorpay_payment_id
-            orderData.paymentStatus = "Pending";
-            //console.log("orderData is : ",orderData)
-            const finalOrder = await checkoutService.checkout(orderData);//-----------------------------------------added to successfully save the order
-            //console.log(orderData)//-----------------------
-            if (finalOrder.status === 200) {
-              toast.success("Order placed successfully");
-              apply_coupon_ultimate();
-              //navigate(`confirmation/${finalOrder.data.orderId}`);
-              clearCart();
-            }
-
-            //console.log("finalOrder placed successfully", finalOrder);
-            const orderId = finalOrder.data.orderId;
-            const mongodbId = finalOrder.data.orderData._id;
-            setOrderDetails({ orderId, mongodbId });
+            // Do NOT call checkout API on failure. The order is already PAYMENT_PENDING.
+            setOrderDetails({ orderId: backendOrderId, mongodbId });
             setPaymentFailureModal(true);
-            clearCart();
           });
 
           rzp.open();
         } catch (error) {
-          //console.error("Error initializing Razorpay:", error);
           toast.error("Failed to initialize payment");
         }
       } else {
-        orderData.paymentStatus = "Completed";
-        const finalOrder = await checkoutService.checkout(orderData);
-        if (finalOrder.status === 200) {
-          toast.success("Order placed successfully");
-          //console.log("final order data: " + finalOrder);
-          apply_coupon_ultimate();
-          navigate(`confirmation/${finalOrder.data.orderId}`);
-          clearCart();
-        }
+        // Wallet or COD
+        toast.success("Order placed successfully");
+        navigate(`confirmation/${backendOrderId}`);
       }
 
 

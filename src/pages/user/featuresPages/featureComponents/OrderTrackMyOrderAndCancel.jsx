@@ -98,17 +98,27 @@ const usePaymentHandler = (orderId) => {
         retry: { enabled: false },
         handler: async (response) => {
           try {
-            const verifyRes = await axiosInstance.post("/verify_retry_razorpay_payment", {
+            const verifyRes = await axiosInstance.post("/reconcile_payment", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             });
 
-            setModalState({
-              isOpen: true,
-              message: verifyRes.data.success ? "Payment successful!" : "Payment verification failed.",
-              success: verifyRes.data.success
-            });
+            if (verifyRes.data.success) {
+              setModalState({
+                isOpen: true,
+                message: "Payment successful! Order confirmed.",
+                success: true
+              });
+              // Reload page or update state to reflect PAID
+              window.location.reload();
+            } else {
+              setModalState({
+                isOpen: true,
+                message: "Payment verification failed.",
+                success: false
+              });
+            }
 
           } catch (err) {
             //console.error("Error verifying payment:", err);
@@ -858,14 +868,15 @@ const OrderTrackingPage = () => {
 
           <div className="bg-gray-50">
             <div className="container mx-auto p-4 md:p-6">
-              {order && order.orderStatus != "Cancelled" &&
+              {order && order.orderStatus !== "Cancelled" &&
                 order.paymentStatus === "Pending" &&
-                order.paymentMethod === "Razor pay" && (
+                order.paymentMethod === "Razor pay" && 
+                new Date(order.reservationExpiresAt) > new Date() && (
                   <div className="bg-red-50 p-4 rounded-lg">
                     <p className="text-red-500 text-center mb-4">
                       Your payment status is pending. Please complete the
-                      payment to avoid order cancellation. If you failed to pay
-                      within 2 days after placing the order, the order gets
+                      payment to avoid order cancellation. If you fail to pay
+                      within the reservation window, the order will be
                       automatically cancelled.
                     </p>
                     <div className="w-full flex justify-center">
@@ -873,7 +884,7 @@ const OrderTrackingPage = () => {
                         className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                         onClick={handlePayment}
                       >
-                        Pay Now
+                        Retry Payment
                       </button>
                     </div>
                   </div>
