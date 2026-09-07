@@ -18,6 +18,11 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
                 role,
             });
 
+            console.log(
+                "Google credential length:",
+                response.credential?.length
+            );
+
             if (res.status === 200) {
                 const { message } = res.data;
 
@@ -26,7 +31,6 @@ const GoogleAuthButton = ({ onSuccessRedirect, role, isDarkMode }) => {
 
                 await dispatch(fetchAuthSession()).unwrap();
 
-                // Navigate to the user or admin home page based on role
                 if (role === "user") {
                     const pendingReturnTo = getPendingReturnTo();
                     if (pendingReturnTo) {
